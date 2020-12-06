@@ -1,0 +1,10 @@
+
+BWA_INDEX: ~/data/Index/hg38_BWA_index/hg38.fa
+frag_path: ~/data/Index/hg38_BWA_index/hg38_cviqi.bed
+chromsizes : ~/data/Index/hg38_BWA_index/hg38.chrom.sizes
+genome: hg38
+cool_bin: 10000
+
+SAMPLES_JSON: './samples.json'
+
+CLUSTER_JSON: './cluster.json'

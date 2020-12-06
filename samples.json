@@ -1,0 +1,10 @@
+{
+    "sample1": {
+        "R1": [
+            "fastq/sample1_L001_R1_001.fq.gz"
+        ],
+        "R2": [
+            "fastq/sample1_L001_R2_001.fq.gz"
+        ]
+    }
+}
