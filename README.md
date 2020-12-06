@@ -1,5 +1,5 @@
 # HiCARTools
-This is the HiCAR datasets processing  pipeline for Ren lab. The pipeline is still in the development stage, please let us know of any bugs and how to improve!
+This is the HiCAR datasets processing  pipeline for Diao lab. The pipeline is still in the development stage, please let us know of any bugs and how to improve!
 
 # work flow of the pipeline
 
