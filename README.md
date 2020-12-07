@@ -50,13 +50,13 @@ e.g.
 4. update the path to bwa index and restriction fragments files in the config.yaml file.
 5. run the snakemake workflow via `snakemake  -p -s HiCARTools -j [NO.of.CPU]`
 6. you can also run the job on HPC cluster scheduler. example for the SLURM system.
-`snakemake --latency-wait 90 -p -j 99 --cluster-config cluster.json --cluster "sbatch -J {cluster.job} --mem={cluster.mem} -N 1 -n {threads} -o {cluster.out} -e {cluster.err} ` 
-
-...
-
+```
+snakemake --latency-wait 90 -p -j 99 --cluster-config cluster.json \
+--cluster "sbatch -J {cluster.job} --mem={cluster.mem} -N 1 -n {threads} -o {cluster.out} -e {cluster.err}
+```
 
 # Output formats: 
-###  [Pairs formate](https://pairtools.readthedocs.io/en/latest/formats.html)
+###  [pairs formate](https://pairtools.readthedocs.io/en/latest/formats.html)
 ```
 Columns: 
 =======
@@ -68,7 +68,7 @@ Columns:
 6) strand1
 7) strand1
 ```
-###[cooler](https://cooler.readthedocs.io/en/latest/datamodel.html), genomically-labeled sparse 2D matrices, which can be viewed by [HiGlass](https://docs.higlass.io)
+### [cooler](https://cooler.readthedocs.io/en/latest/datamodel.html), genomically-labeled sparse 2D matrices, which can be viewed by [HiGlass](https://docs.higlass.io)
 ### ATAC peaks called by macs2.
 
 
