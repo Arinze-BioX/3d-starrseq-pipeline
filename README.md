@@ -7,17 +7,25 @@ This is the HiCAR datasets processing  pipeline for Diao lab. The pipeline is st
 
 
 # Dependencies 
+HiCARTools requires following programs and packages. Install them prior to using HiCARTools. HiCARTools runs on Linux.
 * python3 
+* snakemake (workflow management)
+* cutadaptor
 * BWA 
 * samtools 
 * pairstool
 * pairix
 * cooltools
 * macs2
-* snakemake (workflow management)
+
 
 # Installation
-See INSTALL
+Install the snakemake first via conda. The default conda solver is a bit slow and sometimes has issues with selecting the latest package releases. Therefore, It is recommend to install Mamba as a drop-in replacement via
+`$ conda install -c conda-forge mamba`
+`$ mamba install -c bioconda -c conda-forge snakemake-minimal`
+Makesure you have other programs installed before buy 
+
+
 
 # How to run it.
 1. Remember to install before running anything (see INSTALL).
