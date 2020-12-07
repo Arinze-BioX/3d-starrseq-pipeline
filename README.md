@@ -21,9 +21,11 @@ HiCARTools requires following programs and packages. Install them prior to using
 
 # Installation
 Install the snakemake first via conda. The default conda solver is a bit slow and sometimes has issues with selecting the latest package releases. Therefore, It is recommend to install Mamba as a drop-in replacement via 
-`$ conda install -c conda-forge mamba` 
+`$ conda install -c conda-forge mamba`
+
 `$ mamba install -c bioconda -c conda-forge snakemake-minimal` 
-Makesure you have other programs installed before buy 
+
+Makesure you have other programs installed before run the snakemake. 
 
 
 
