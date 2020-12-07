@@ -1,10 +1,8 @@
 # HiCARTools
-This is the HiCAR datasets processing  pipeline for Diao lab. The pipeline is followed the 4DN is still in the development stage, please let us know of any bugs and how to improve!
+This is the HiCAR datasets processing  pipeline for Diao lab. The pipeline is followed the [4DN HiC process pipeline](https://data.4dnucleome.org/resources/data-analysis/hi_c-processing-pipeline)  is still in the development stage, please let us know of any bugs and how to improve!
 
 # work flow of the pipeline
-
 ![](./workflow.svg)
-
 
 # Dependencies 
 HiCARTools requires following programs and packages. Install them prior to using HiCARTools. HiCARTools runs on Linux.
@@ -27,11 +25,12 @@ mamba install -c bioconda -c conda-forge snakemake-minimal
 ```
 install other dependencies and add them to the path.
 You will also need the bwa index of your genome, which can be created via `bwa index [ref_genome_fastq_file]`.
-The genome restriction fragments file can be created by cooler via `cooler digest -o output.bed CHROMSIZES_PATH FASTA_PATH ENZYME`
+The genome restriction fragments file can be created by cooler via
+ `cooler digest -o output.bed CHROMSIZES_PATH FASTA_PATH ENZYME`
 
 
-# How to run it.
-1. git clone https://github.com/diao-lab/HiCARTools.git
+# How to run the workflow.
+1. Obtain a copy of this workflow. `git clone https://github.com/diao-lab/HiCARTools.git`
 2. Inside `HiCARTools`folder, create a folder named `fastq`, and put all your .fastq files in that folder. 
 3. create sample information meta file in the json formate.
 e.g. 
@@ -51,7 +50,7 @@ e.g.
 5. run the snakemake workflow via `snakemake  -p -s HiCARTools -j [NO.of.CPU]`
 6. you can also run the job on HPC cluster scheduler. example for the SLURM system.
 ```
-snakemake --latency-wait 90 -p -j 99 --cluster-config cluster.json \
+snakemake --latency-wait 90 -p -s HiCARTools -j 99 --cluster-config cluster.json \
 --cluster "sbatch -J {cluster.job} --mem={cluster.mem} -N 1 -n {threads} -o {cluster.out} -e {cluster.err}
 ```
 
