@@ -1,5 +1,5 @@
 # HiCARTools
-This is the HiCAR datasets processing  pipeline for Diao lab. The pipeline is still in the development stage, please let us know of any bugs and how to improve!
+This is the HiCAR datasets processing  pipeline for Diao lab. The pipeline is followed the 4DN is still in the development stage, please let us know of any bugs and how to improve!
 
 # work flow of the pipeline
 
@@ -9,50 +9,67 @@ This is the HiCAR datasets processing  pipeline for Diao lab. The pipeline is st
 # Dependencies 
 HiCARTools requires following programs and packages. Install them prior to using HiCARTools. HiCARTools runs on Linux.
 * python3 
-* snakemake (workflow management)
-* cutadaptor
-* BWA 
-* samtools 
-* pairstool
-* pairix
-* cooltools
-* macs2
+* [snakemake](https://snakemake.readthedocs.io/en/stable/) (workflow management)
+* [cutadaptor](https://cutadapt.readthedocs.io/en/stable/)
+* [BWA ](http://bio-bwa.sourceforge.net)
+* [samtools ](http://www.htslib.org/download/)
+* [pairstool](https://pairtools.readthedocs.io/en/latest/installation.html)
+* [pairix](https://github.com/4dn-dcic/pairix#installation-for-pairix)
+* [cooler](https://github.com/open2c/cooler)
+* [macs2](https://github.com/macs3-project/MACS)
 
 
 # Installation
 Install the snakemake first via conda. The default conda solver is a bit slow and sometimes has issues with selecting the latest package releases. Therefore, It is recommend to install Mamba as a drop-in replacement via 
-`$ conda install -c conda-forge mamba`
-
-`$ mamba install -c bioconda -c conda-forge snakemake-minimal` 
-
-Makesure you have other programs installed before run the snakemake. 
-
+```
+conda install -c conda-forge mamba
+mamba install -c bioconda -c conda-forge snakemake-minimal 
+```
+install other dependencies and add them to the path.
+You will also need the bwa index of your genome, which can be created via `bwa index [ref_genome_fastq_file]`.
+The genome restriction fragments file can be created by cooler via `cooler digest -o output.bed CHROMSIZES_PATH FASTA_PATH ENZYME`
 
 
 # How to run it.
-1. Remember to install before running anything (see INSTALL).
-2. Create your project folder. 
-3. Inside your project folder, create a folder named `fastq`, and put all your .fastq files in that folder.  
+1. git clone https://github.com/diao-lab/HiCARTools.git
+2. Inside `HiCARTools`folder, create a folder named `fastq`, and put all your .fastq files in that folder. 
+3. create sample information meta file in the json formate.
+e.g. 
+```
+{
+    "sample1": {
+        "R1": [
+            "fastq/sample1_L001_R1_001.fq.gz"
+        ],
+        "R2": [
+            "fastq/sample1_L001_R2_001.fq.gz"
+        ]
+    }
+}
+```
+4. update the path to bwa index and restriction fragments files in the config.yaml file.
+5. run the snakemake workflow via `snakemake  -p -s HiCARTools -j [NO.of.CPU]`
+6. you can also run the job on HPC cluster scheduler. example for the SLURM system.
+`snakemake --latency-wait 90 -p -j 99 --cluster-config cluster.json --cluster "sbatch -J {cluster.job} --mem={cluster.mem} -N 1 -n {threads} -o {cluster.out} -e {cluster.err} ` 
+
 ...
 
 
 # Output formats: 
-##  Pairs: 
+###  [Pairs formate](https://pairtools.readthedocs.io/en/latest/formats.html)
 ```
 Columns: 
 =======
-1)Read Name 
-2) R1 mapping Flag
-3) R1 chr 
-4) R1 position 
-5) R1 fragment 
-6) R2 mapping Flag
-7) R2 chr 
-8) R2 position 
-9) R2 fragment 
-10) R1 mapping quality
-11) R2 mapping quality
+1) Read Name 
+2) chr1
+3) pos1
+4) chr2
+5) pos2
+6) strand1
+7) strand1
 ```
+###[cooler](https://cooler.readthedocs.io/en/latest/datamodel.html), genomically-labeled sparse 2D matrices, which can be viewed by [HiGlass](https://docs.higlass.io)
+### ATAC peaks called by macs2.
 
-# Contributing Authors
+
 
