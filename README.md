@@ -1,5 +1,5 @@
 # HiCARTools
-This is the HiCAR datasets processing  pipeline for Diao lab. The pipeline is followed the [4DN HiC process pipeline](https://data.4dnucleome.org/resources/data-analysis/hi_c-processing-pipeline)  is still in the development stage, please let us know of any bugs and how to improve!
+This is the HiCAR datasets processing  pipeline for Diao lab. The pipeline is followed the [4DN HiC process pipeline](https://data.4dnucleome.org/resources/data-analysis/hi_c-processing-pipeline)  and is still in the development stage, please let us know of any bugs and how to improve!
 
 # work flow of the pipeline
 ![](./workflow.svg)
