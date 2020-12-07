@@ -54,8 +54,8 @@ snakemake --latency-wait 90 -p -s HiCARTools -j 99 --cluster-config cluster.json
 --cluster "sbatch -J {cluster.job} --mem={cluster.mem} -N 1 -n {threads} -o {cluster.out} -e {cluster.err}
 ```
 
-# Output formats: 
-###  [pairs formate](https://pairtools.readthedocs.io/en/latest/formats.html)
+# Output files: 
+###  [pairs](https://pairtools.readthedocs.io/en/latest/formats.html) for each sample.
 ```
 Columns: 
 =======
