@@ -5,16 +5,16 @@ This is the HiCAR datasets processing  pipeline for Diao lab. The pipeline is fo
 ![](./workflow.svg)
 
 # Dependencies 
-HiCARTools requires following programs and packages. Install them prior to using HiCARTools. HiCARTools runs on Linux.
-* python3 
-* [snakemake](https://snakemake.readthedocs.io/en/stable/) (workflow management)
-* [cutadaptor](https://cutadapt.readthedocs.io/en/stable/)
-* [BWA ](http://bio-bwa.sourceforge.net)
-* [samtools ](http://www.htslib.org/download/)
-* [pairstool](https://pairtools.readthedocs.io/en/latest/installation.html)
-* [pairix](https://github.com/4dn-dcic/pairix#installation-for-pairix)
-* [cooler](https://github.com/open2c/cooler)
-* [macs2](https://github.com/macs3-project/MACS)
+HiCARTools requires following programs and packages. Please install them prior to using HiCARTools. HiCARTools runs on Linux.
+* python 3 version
+* [snakemake] 5.28 (https://snakemake.readthedocs.io/en/stable/) (workflow management)
+* [cutadaptor] 3.0(https://cutadapt.readthedocs.io/en/stable/)
+* [BWA ] 0.7.1(http://bio-bwa.sourceforge.net)
+* [samtools ]1.1(http://www.htslib.org/download/)
+* [pairstool] 0.3 (https://pairtools.readthedocs.io/en/latest/installation.html)
+* [pairix]0.3.7(https://github.com/4dn-dcic/pairix#installation-for-pairix)
+* [cooler]0.8 (https://github.com/open2c/cooler)
+* [macs2]2.2.7(https://github.com/macs3-project/MACS)
 
 
 # Installation
@@ -23,7 +23,7 @@ Install the snakemake first via conda. The default conda solver is a bit slow an
 conda install -c conda-forge mamba
 mamba install -c bioconda -c conda-forge snakemake-minimal 
 ```
-install other dependencies and add them to the path.
+Install other dependencies and add them to the path.
 You will also need the bwa index of your genome, which can be created via `bwa index [ref_genome_fastq_file]`.
 The genome restriction fragments file can be created by cooler via
  `cooler digest -o output.bed CHROMSIZES_PATH FASTA_PATH ENZYME`
@@ -55,7 +55,7 @@ snakemake --latency-wait 90 -p -s HiCARTools -j 99 --cluster-config cluster.json
 ```
 
 # Output files: 
-###  [pairs](https://pairtools.readthedocs.io/en/latest/formats.html) for each sample.
+###  [pairs](https://pairtools.readthedocs.io/en/latest/formats.html) containing a list of valid contacts.
 ```
 Columns: 
 =======
