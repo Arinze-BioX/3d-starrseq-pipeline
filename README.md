@@ -7,14 +7,14 @@ This is the HiCAR datasets processing  pipeline for Diao lab. The pipeline is fo
 # Dependencies 
 HiCARTools requires following programs and packages. Please install them prior to using HiCARTools. HiCARTools runs on Linux.
 * python 3 version
-* [snakemake] 5.28 (https://snakemake.readthedocs.io/en/stable/) (workflow management)
-* [cutadaptor] 3.0(https://cutadapt.readthedocs.io/en/stable/)
-* [BWA ] 0.7.1(http://bio-bwa.sourceforge.net)
-* [samtools ]1.1(http://www.htslib.org/download/)
-* [pairstool] 0.3 (https://pairtools.readthedocs.io/en/latest/installation.html)
-* [pairix]0.3.7(https://github.com/4dn-dcic/pairix#installation-for-pairix)
-* [cooler]0.8 (https://github.com/open2c/cooler)
-* [macs2]2.2.7(https://github.com/macs3-project/MACS)
+* [snakemake](https://snakemake.readthedocs.io/en/stable/) (workflow management) 5.28
+* [cutadaptor](https://cutadapt.readthedocs.io/en/stable/) 3.0
+* [BWA](http://bio-bwa.sourceforge.net)  0.7.1
+* [samtools](http://www.htslib.org/download/) 1.1
+* [pairstool](https://pairtools.readthedocs.io/en/latest/installation.html)  0.3
+* [pairix](https://github.com/4dn-dcic/pairix#installation-for-pairix) 0.3.7
+* [cooler](https://github.com/open2c/cooler) 0.8
+* [macs2](https://github.com/macs3-project/MACS) 2.2.7
 
 
 # Installation
