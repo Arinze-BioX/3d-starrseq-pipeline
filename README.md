@@ -68,7 +68,7 @@ Columns:
 7) strand1
 ```
 ### [cooler](https://cooler.readthedocs.io/en/latest/datamodel.html), genomically-labeled sparse 2D matrices, which can be viewed by [HiGlass](https://docs.higlass.io)
-The chromatin interaction can be further called using [MAPS](https://github.com/ijuric/MAPS).
+### The chromatin interaction can be further called using [MAPS](https://github.com/ijuric/MAPS).
 ### ATAC peaks called by macs2.
 
 For any questions regarding HiCARTools please send mail to Yu Xiang ( yu.xiang@duke.edu )
