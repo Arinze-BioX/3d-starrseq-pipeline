@@ -71,6 +71,7 @@ Columns:
 ### The chromatin interaction can be further identified using [MAPS](https://github.com/ijuric/MAPS).
 ### ATAC peaks called by macs2.
 
+
 For any questions regarding HiCARTools please send mail to Yu Xiang ( yu.xiang@duke.edu )
 
 
