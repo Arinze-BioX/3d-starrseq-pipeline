@@ -1,0 +1,28 @@
+Migrating .snakemake folder to new format...
+Migration complete
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cluster nodes: 99
+Job stats:
+job                                         count    min threads    max threads
+----------------------------------------  -------  -------------  -------------
+ATAC_macs2_peaks                                3              1              1
+ATAC_reads_Tn5_shifting_duplicate_remove        3              1              1
+HiC_contact_matrices_Cooler                     3             10             10
+UMItools_deduplication                          3             24             24
+all                                             1              1              1
+bwa_mem_mapping                                 3             24             24
+count_duplicate_pairs                           3              1              1
+extract_R2_ATAC_reads                           3              8              8
+fastq_UMI_extraction                            3             12             12
+fastq_select_valid                              3             12             12
+make_index                                      3              5              5
+parse_pairs_from_BAM_files                      3              2              2
+remove_duplicate_pairs                          3              5              5
+remove_same_fragment_pairs                      3              5              5
+samtools_index                                  3              1              1
+samtools_sort_bam                               3              1              1
+select_valid_pairs                              3              8              8
+total                                          49              1             24
+
+Select jobs to execute...

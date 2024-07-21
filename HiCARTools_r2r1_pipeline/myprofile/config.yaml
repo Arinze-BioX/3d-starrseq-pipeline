@@ -1,0 +1,4 @@
+executor: slurm
+latency-wait: 90
+configfile: "./config_file.yaml"
+

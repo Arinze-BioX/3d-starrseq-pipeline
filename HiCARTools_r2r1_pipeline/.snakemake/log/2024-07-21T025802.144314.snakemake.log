@@ -1,0 +1,102 @@
+Building DAG of jobs...
+You are running snakemake in a SLURM job context. This is not recommended, as it may lead to unexpected behavior.Please run Snakemake directly on the login node.
+SLURM run ID: 51832d78-e89c-432f-a1d0-56326c4d598e
+Using shell: /usr/bin/bash
+Provided remote nodes: 99
+Job stats:
+job                                         count
+----------------------------------------  -------
+ATAC_macs2_peaks                                3
+ATAC_reads_Tn5_shifting_duplicate_remove        3
+HiC_contact_matrices_Cooler                     3
+UMItools_deduplication                          3
+all                                             1
+bwa_mem_mapping                                 3
+count_duplicate_pairs                           3
+extract_R2_ATAC_reads                           3
+fastq_UMI_extraction                            3
+fastq_select_valid                              3
+make_index                                      3
+parse_pairs_from_BAM_files                      3
+remove_duplicate_pairs                          3
+remove_same_fragment_pairs                      3
+samtools_index                                  3
+samtools_sort_bam                               3
+select_valid_pairs                              3
+total                                          49
+
+Select jobs to execute...
+Execute 3 jobs...
+
+[Sun Jul 21 02:58:09 2024]
+Job 9: select reads with correct orientation
+Reason: Missing output files: 00_valid_fastq/GM_DNA_R2R1_rep1_valid_r1.fq.gz, 00_valid_fastq/GM_DNA_R2R1_rep1_valid_r2.fq.gz
+
+cutadapt -Z -j 1 -e 0.16 --action none --discard-untrimmed -g ^ACANNNNTGTGCGAACTCAGACC -o 00_valid_fastq/GM_DNA_R2R1_rep1_valid_r1.fq.gz -p 00_valid_fastq/GM_DNA_R2R1_rep1_valid_r2.fq.gz /datacommons/ydiaolab/arinze/ThreeD_STARRseq/dna_libPrep_optimization/onetwenty_ng_trial/demultiplex/AO80_GM_3DSTARR_DNA_R2R1_oldMethod_rep1_R1_001.fastq.gz /datacommons/ydiaolab/arinze/ThreeD_STARRseq/dna_libPrep_optimization/onetwenty_ng_trial/demultiplex/AO80_GM_3DSTARR_DNA_R2R1_oldMethod_rep1_R2_001.fastq.gz 2> 00_log/GM_DNA_R2R1_rep1.removeadapt
+
+No SLURM account given, trying to guess.
+Guessed SLURM account: gcb
+No wall time information given. This might or might not work on your cluster. If not, specify the resource runtime in your rule or as a reasonable default via --default-resources.
+Job 9 has been submitted with SLURM jobid 13007316 (log: /cwork/aeo21/3D-STARRseq/GM_DNA_July2024/HiCARTools_r2r1_pipeline/.snakemake/slurm_logs/rule_fastq_select_valid/GM_DNA_R2R1_rep1/13007316.log).
+
+[Sun Jul 21 02:58:10 2024]
+Job 29: select reads with correct orientation
+Reason: Missing output files: 00_valid_fastq/GM_DNA_R2R1_rep3_valid_r2.fq.gz, 00_valid_fastq/GM_DNA_R2R1_rep3_valid_r1.fq.gz
+
+cutadapt -Z -j 1 -e 0.16 --action none --discard-untrimmed -g ^ACANNNNTGTGCGAACTCAGACC -o 00_valid_fastq/GM_DNA_R2R1_rep3_valid_r1.fq.gz -p 00_valid_fastq/GM_DNA_R2R1_rep3_valid_r2.fq.gz /cwork/aeo21/3D-STARRseq/dna_lib_demultiplex_May2024/AO109_GM_3DSTARRseq_DNA_R2R1_primExt_rep3_R1_001.fastq.gz /cwork/aeo21/3D-STARRseq/cdna_H1_april2024/demultiplex/AO102_H1_3DSTARRseq_RNA_R2R1_rep2a_R2_001.fastq.gz 2> 00_log/GM_DNA_R2R1_rep3.removeadapt
+
+No wall time information given. This might or might not work on your cluster. If not, specify the resource runtime in your rule or as a reasonable default via --default-resources.
+Job 29 has been submitted with SLURM jobid 13007317 (log: /cwork/aeo21/3D-STARRseq/GM_DNA_July2024/HiCARTools_r2r1_pipeline/.snakemake/slurm_logs/rule_fastq_select_valid/GM_DNA_R2R1_rep3/13007317.log).
+
+[Sun Jul 21 02:58:10 2024]
+Job 19: select reads with correct orientation
+Reason: Missing output files: 00_valid_fastq/GM_DNA_R2R1_rep2_valid_r1.fq.gz, 00_valid_fastq/GM_DNA_R2R1_rep2_valid_r2.fq.gz
+
+cutadapt -Z -j 1 -e 0.16 --action none --discard-untrimmed -g ^ACANNNNTGTGCGAACTCAGACC -o 00_valid_fastq/GM_DNA_R2R1_rep2_valid_r1.fq.gz -p 00_valid_fastq/GM_DNA_R2R1_rep2_valid_r2.fq.gz /datacommons/ydiaolab/arinze/ThreeD_STARRseq/dna_libPrep_optimization/onetwenty_ng_trial/demultiplex/AO81_GM_3DSTARR_DNA_R2R1_oldMethod_rep2_R1_001.fastq.gz /datacommons/ydiaolab/arinze/ThreeD_STARRseq/dna_libPrep_optimization/onetwenty_ng_trial/demultiplex/AO81_GM_3DSTARR_DNA_R2R1_oldMethod_rep2_R2_001.fastq.gz 2> 00_log/GM_DNA_R2R1_rep2.removeadapt
+
+No wall time information given. This might or might not work on your cluster. If not, specify the resource runtime in your rule or as a reasonable default via --default-resources.
+Job 19 has been submitted with SLURM jobid 13007318 (log: /cwork/aeo21/3D-STARRseq/GM_DNA_July2024/HiCARTools_r2r1_pipeline/.snakemake/slurm_logs/rule_fastq_select_valid/GM_DNA_R2R1_rep2/13007318.log).
+[Sun Jul 21 02:58:42 2024]
+Error in rule fastq_select_valid:
+    message: SLURM-job '13007316' failed, SLURM status is: 'FAILED'. For further error details see the cluster/cloud log and the log files of the involved rule(s).
+    jobid: 9
+    input: /datacommons/ydiaolab/arinze/ThreeD_STARRseq/dna_libPrep_optimization/onetwenty_ng_trial/demultiplex/AO80_GM_3DSTARR_DNA_R2R1_oldMethod_rep1_R1_001.fastq.gz, /datacommons/ydiaolab/arinze/ThreeD_STARRseq/dna_libPrep_optimization/onetwenty_ng_trial/demultiplex/AO80_GM_3DSTARR_DNA_R2R1_oldMethod_rep1_R2_001.fastq.gz
+    output: 00_valid_fastq/GM_DNA_R2R1_rep1_valid_r1.fq.gz, 00_valid_fastq/GM_DNA_R2R1_rep1_valid_r2.fq.gz
+    log: 00_log/GM_DNA_R2R1_rep1.removeadapt, /cwork/aeo21/3D-STARRseq/GM_DNA_July2024/HiCARTools_r2r1_pipeline/.snakemake/slurm_logs/rule_fastq_select_valid/GM_DNA_R2R1_rep1/13007316.log (check log file(s) for error details)
+    shell:
+        cutadapt -Z -j 1 -e 0.16 --action none --discard-untrimmed -g ^ACANNNNTGTGCGAACTCAGACC -o 00_valid_fastq/GM_DNA_R2R1_rep1_valid_r1.fq.gz -p 00_valid_fastq/GM_DNA_R2R1_rep1_valid_r2.fq.gz /datacommons/ydiaolab/arinze/ThreeD_STARRseq/dna_libPrep_optimization/onetwenty_ng_trial/demultiplex/AO80_GM_3DSTARR_DNA_R2R1_oldMethod_rep1_R1_001.fastq.gz /datacommons/ydiaolab/arinze/ThreeD_STARRseq/dna_libPrep_optimization/onetwenty_ng_trial/demultiplex/AO80_GM_3DSTARR_DNA_R2R1_oldMethod_rep1_R2_001.fastq.gz 2> 00_log/GM_DNA_R2R1_rep1.removeadapt
+
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+    external_jobid: 13007316
+
+[Sun Jul 21 02:58:42 2024]
+Error in rule fastq_select_valid:
+    message: SLURM-job '13007317' failed, SLURM status is: 'FAILED'. For further error details see the cluster/cloud log and the log files of the involved rule(s).
+    jobid: 29
+    input: /cwork/aeo21/3D-STARRseq/dna_lib_demultiplex_May2024/AO109_GM_3DSTARRseq_DNA_R2R1_primExt_rep3_R1_001.fastq.gz, /cwork/aeo21/3D-STARRseq/cdna_H1_april2024/demultiplex/AO102_H1_3DSTARRseq_RNA_R2R1_rep2a_R2_001.fastq.gz
+    output: 00_valid_fastq/GM_DNA_R2R1_rep3_valid_r1.fq.gz, 00_valid_fastq/GM_DNA_R2R1_rep3_valid_r2.fq.gz
+    log: 00_log/GM_DNA_R2R1_rep3.removeadapt, /cwork/aeo21/3D-STARRseq/GM_DNA_July2024/HiCARTools_r2r1_pipeline/.snakemake/slurm_logs/rule_fastq_select_valid/GM_DNA_R2R1_rep3/13007317.log (check log file(s) for error details)
+    shell:
+        cutadapt -Z -j 1 -e 0.16 --action none --discard-untrimmed -g ^ACANNNNTGTGCGAACTCAGACC -o 00_valid_fastq/GM_DNA_R2R1_rep3_valid_r1.fq.gz -p 00_valid_fastq/GM_DNA_R2R1_rep3_valid_r2.fq.gz /cwork/aeo21/3D-STARRseq/dna_lib_demultiplex_May2024/AO109_GM_3DSTARRseq_DNA_R2R1_primExt_rep3_R1_001.fastq.gz /cwork/aeo21/3D-STARRseq/cdna_H1_april2024/demultiplex/AO102_H1_3DSTARRseq_RNA_R2R1_rep2a_R2_001.fastq.gz 2> 00_log/GM_DNA_R2R1_rep3.removeadapt
+
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+    external_jobid: 13007317
+
+[Sun Jul 21 02:58:42 2024]
+Error in rule fastq_select_valid:
+    message: SLURM-job '13007318' failed, SLURM status is: 'FAILED'. For further error details see the cluster/cloud log and the log files of the involved rule(s).
+    jobid: 19
+    input: /datacommons/ydiaolab/arinze/ThreeD_STARRseq/dna_libPrep_optimization/onetwenty_ng_trial/demultiplex/AO81_GM_3DSTARR_DNA_R2R1_oldMethod_rep2_R1_001.fastq.gz, /datacommons/ydiaolab/arinze/ThreeD_STARRseq/dna_libPrep_optimization/onetwenty_ng_trial/demultiplex/AO81_GM_3DSTARR_DNA_R2R1_oldMethod_rep2_R2_001.fastq.gz
+    output: 00_valid_fastq/GM_DNA_R2R1_rep2_valid_r1.fq.gz, 00_valid_fastq/GM_DNA_R2R1_rep2_valid_r2.fq.gz
+    log: 00_log/GM_DNA_R2R1_rep2.removeadapt, /cwork/aeo21/3D-STARRseq/GM_DNA_July2024/HiCARTools_r2r1_pipeline/.snakemake/slurm_logs/rule_fastq_select_valid/GM_DNA_R2R1_rep2/13007318.log (check log file(s) for error details)
+    shell:
+        cutadapt -Z -j 1 -e 0.16 --action none --discard-untrimmed -g ^ACANNNNTGTGCGAACTCAGACC -o 00_valid_fastq/GM_DNA_R2R1_rep2_valid_r1.fq.gz -p 00_valid_fastq/GM_DNA_R2R1_rep2_valid_r2.fq.gz /datacommons/ydiaolab/arinze/ThreeD_STARRseq/dna_libPrep_optimization/onetwenty_ng_trial/demultiplex/AO81_GM_3DSTARR_DNA_R2R1_oldMethod_rep2_R1_001.fastq.gz /datacommons/ydiaolab/arinze/ThreeD_STARRseq/dna_libPrep_optimization/onetwenty_ng_trial/demultiplex/AO81_GM_3DSTARR_DNA_R2R1_oldMethod_rep2_R2_001.fastq.gz 2> 00_log/GM_DNA_R2R1_rep2.removeadapt
+
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+    external_jobid: 13007318
+
+Shutting down, this might take some time.
+Exiting because a job execution failed. Look above for error message
+Complete log: .snakemake/log/2024-07-21T025802.144314.snakemake.log
+WorkflowError:
+At least one job did not complete successfully.

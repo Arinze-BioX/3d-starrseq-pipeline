@@ -1,0 +1,7 @@
+sample  R1   R2
+H1_R2only_rep1  /datacommons/ydiaolab/bgi_data/demutiplex/YD155_YD158/AO/AO31_R1_001.fastq.gz   /datacommons/ydiaolab/bgi_data/demutiplex/YD155_YD158/AO/AO31_R2_001.fastq.gz
+H1_R2only_rep2  /datacommons/ydiaolab/bgi_data/demutiplex/YD155_YD158/AO/AO32_R1_001.fastq.gz   /datacommons/ydiaolab/bgi_data/demutiplex/YD155_YD158/AO/AO32_R2_001.fastq.gz
+H1_R2only_rep3  /datacommons/ydiaolab/bgi_data/demutiplex/YD154/AO/AO33_R1_001.fastq.gz /datacommons/ydiaolab/bgi_data/demutiplex/YD154/AO/AO33_R2_001.fastq.gz
+GM12878_R2only_rep1 /datacommons/ydiaolab/bgi_data/demutiplex/YD156_YD159/AO/AO34_R1_001.fastq.gz   /datacommons/ydiaolab/bgi_data/demutiplex/YD156_YD159/AO/AO34_R2_001.fastq.gz
+GM12878_R2only_rep2 /datacommons/ydiaolab/bgi_data/demutiplex/YD155_YD158/AO/AO35_R1_001.fastq.gz   /datacommons/ydiaolab/bgi_data/demutiplex/YD155_YD158/AO/AO35_R2_001.fastq.gz
+GM12878_R2only_rep3 /datacommons/ydiaolab/bgi_data/demutiplex/YD154/AO/AO36_R1_001.fastq.gz /datacommons/ydiaolab/bgi_data/demutiplex/YD154/AO/AO36_R2_001.fastq.gz

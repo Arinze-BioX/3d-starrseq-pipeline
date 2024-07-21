@@ -1,0 +1,3 @@
+NameError in line 241 of /cwork/aeo21/3D-STARRseq/GM_DNA_July2024/HiCARTools_r2r1_pipeline/HiCARTools:
+name 'checkpoint' is not defined
+  File "/cwork/aeo21/3D-STARRseq/GM_DNA_July2024/HiCARTools_r2r1_pipeline/HiCARTools", line 241, in <module>

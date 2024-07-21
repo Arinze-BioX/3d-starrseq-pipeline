@@ -1,0 +1,170 @@
+shell.prefix("set -eo pipefail; echo BEGIN at $(date); ")
+shell.suffix("; exitstat=$?; echo END at $(date); echo exit status was $exitstat; exit $exitstat")
+
+configfile: "config.yaml"
+
+smooth_window  = 150
+shiftsize      = -75
+genome_version = 'hs'
+pval_thresh    = 0.01
+
+FILES      = json.load(open(config['SAMPLES_JSON']))
+SAMPLES    = sorted(FILES.keys())
+BWA_INDEX  = config['BWA_INDEX']
+chromsizes = config['chromsizes']
+genome     = config['genome']
+frag_path  = config['frag_path']
+cool_bin   = config['cool_bin']
+nla3_bed   = config['nla3_bed']
+
+TARGETS = []
+peaks  = expand("macs2_peak/{sample}_{genome}_peaks.narrowPeak" , sample = SAMPLES, genome = genome)
+finalbed = expand("final_bed-{genome}/{sample}_unique_frags_with_counts.bed", sample = SAMPLES, genome = genome)
+TARGETS.extend(peaks)
+TARGETS.extend(finalbed)
+
+localrules: all
+
+rule all:
+    input: TARGETS
+
+rule fastq_select_valid:
+    input:
+        r1 = lambda wildcards: FILES[wildcards.sample]['R1'],
+        r2 = lambda wildcards: FILES[wildcards.sample]['R2']
+    output: 
+        "00_valid_fastq/{sample}_valid_r1.fq.gz", 
+        "00_valid_fastq/{sample}_valid_r2.fq.gz"
+    threads: 12
+    message: "select reads with correct orientation"
+    log:
+         "00_log/{sample}.removeadapt"
+    shell:
+        """cutadapt -Z -j {threads} -e 0.25 --action none --discard-untrimmed -g ^CATG -o {output[0]} -p {output[1]} {input[0]} {input[1]} 2> {log}
+"""
+    
+rule fastq_UMI_extraction:
+    input: 
+        "00_valid_fastq/{sample}_valid_r1.fq.gz", 
+        "00_valid_fastq/{sample}_valid_r2.fq.gz"
+    output: 
+        "00_UMI_named_fq/{sample}_UMIextracted_r1.fq.gz", 
+        "00_UMI_named_fq/{sample}_UMIextracted_r2.fq.gz"
+    threads: 12
+    message: "Remove non-biological sequences and add umi to read name for already demultiplexed reads"
+    log:
+         "00_log/{sample}.extractUMI", "00_log/{sample}_errors.extractUMI"
+    shell:
+        """umi_tools extract --extract-method=regex --ignore-read-pair-suffixes \
+--bc-pattern2='.+(?P<discard_1>.{{10}})(?P<umi_2>.{{8}})(?P<discard_2>.{{12}})' \
+--log={log[0]} -I {input[0]} -S {output[0]} \
+--read2-in={input[1]} --read2-out={output[1]} > {log[1]}
+"""
+
+
+rule bwa_mem_mapping:
+    input:
+        r1 = "00_UMI_named_fq/{sample}_UMIextracted_r1.fq.gz",
+        r2 = "00_UMI_named_fq/{sample}_UMIextracted_r2.fq.gz"
+    output: "01_bam/{sample}.bam"
+    threads: 24
+    message: "bwa {input}: {threads} threads"
+    log:
+        "00_log/{sample}.bwa"
+    shell:
+        """bwa mem  -SP -t {threads} {BWA_INDEX} {input} | samtools view -bS - > {output}  2> {log}"""
+
+
+rule samtools_sort_bam:
+    input:  "01_bam/{sample}.bam"
+    output: "02_bam/{sample}.bam"
+    threads: 1
+    message: "samtools index bam files for deduplication {input}: {threads} threads"
+    log:
+        "00_log/{sample}_sort.samtools", "00_log/{sample}_index.samtools"
+    shell:
+        """
+        samtools sort {input} -o {output} 2> {log[0]}
+        """
+
+rule samtools_index:
+    input:  "02_bam/{sample}.bam"
+    output: "02_bam/{sample}.bam.bai"
+    threads: 1
+    message: "bam indexing"
+    log:
+        "00_log/{sample}_index.samtools"
+    shell:
+        """samtools index {input}"""
+
+
+rule UMItools_deduplication:
+    input:  "02_bam/{sample}.bam","02_bam/{sample}.bam.bai"
+    output: "umicollapse_dedup/{sample}_UMIcollapse_dedup.bam"
+    threads: 24
+    message: "umitools deduplication based on UMI {input}: {threads} threads"
+    log:
+        "00_log/{sample}_dedupLog.umitools"
+    shell:
+        """
+        source /datacommons/ydiaolab/arinze/apps/miniconda_20220118/etc/profile.d/conda.sh
+        conda activate snakemake_HiCAR
+        umi_tools dedup --stdin={input[0]} --log={log} --unpaired-reads=discard --paired > {output}"""
+
+
+rule parse_BAM_files: ## no flip to makesure the R1 R2 position for the peak calling
+    input:  "umicollapse_dedup/{sample}_UMIcollapse_dedup.bam"
+    output: "pairs-{genome}/{sample}.sorted.pairs.gz"
+    message: "parse bam {input} "
+    log:
+        "00_log/{sample}_{genome}_parse.samtools"
+    threads: 4
+    shell:
+        """
+        source /datacommons/ydiaolab/arinze/apps/miniconda_20220118/etc/profile.d/conda.sh
+        conda activate bedtools
+        samtools view -b -F 260 {input} | samtools sort -n | bedtools bamtobed -bedpe -mate1 |\
+        awk -F'\\t' -v OFS="\\t" '{{if ($1!=$4 ) next; if ($9=="+") {{s=$2;e=$6}} else {{s=$5;e=$3}} if (e>s) print $1,s,e,$7,$9 }}' |\
+        sort -k1,1V -k2,2n | gzip -nc > {output} 2> {log}
+        """
+
+rule count_duplicate_pairs:
+    input:  "pairs-{genome}/{sample}.sorted.pairs.gz"
+    output: "final_bed-{genome}/{sample}_unique_frags_with_counts.bed"
+    threads: 1
+    message: "count fragments per position"
+    log:
+        "00_log/{sample}_{genome}_count_finalBed.bedtools_groupby"
+    shell:
+        """
+        source /datacommons/ydiaolab/arinze/apps/miniconda_20220118/etc/profile.d/conda.sh
+        conda activate bedtools
+        zcat {input} | bedtools groupby -g 1-3,5 -c 3 -o count > {output} 2> {log}
+        """
+
+
+rule make_bedpe_Tn5_shift:
+    input:  "final_bed-{genome}/{sample}_unique_frags_with_counts.bed"
+    output: "macs2_peak-{genome}/{sample}_atac_pairs.bed"
+    threads: 1
+    message: "make bedpe file and shift start and end (Tn5 shift)"
+    log:
+        "00_log/{sample}_{genome}_Tn5_shift.bedtools"
+    shell:
+        """
+        awk ' BEGIN {{OFS="\\t"}}; {{if ($4=="+") {{$2=$2+4}} else if ($4 == "-") {{$2 = $3-5}} print $1, $2, $2+1, "*", "*", $4}} ' {input} > {output}
+"""
+
+rule ATAC_macs2_peaks:
+    input:  "macs2_peak-{genome}/{sample}_atac_pairs.bed"
+    output: "macs2_peak/{sample}_{genome}_peaks.narrowPeak"
+    threads:1
+    params: name = "{sample}_{genome}"
+    log:
+            "00_log/{sample}_{genome}_peakCalling.macs2"
+    shell:
+        """
+        source /datacommons/ydiaolab/arinze/apps/miniconda_20220118/etc/profile.d/conda.sh
+        conda activate snakemake_HiCAR
+        macs2 callpeak -t {input} -f BED -n {params.name}  -g {genome_version} --qval {pval_thresh} --shift {shiftsize} --extsize {smooth_window} --nomodel -B --SPMR --keep-dup all --call-summits --outdir macs2_peak
+"""

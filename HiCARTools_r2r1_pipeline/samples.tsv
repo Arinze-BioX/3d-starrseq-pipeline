@@ -1,0 +1,4 @@
+sample  R1   R2
+GM_DNA_R2R1_rep1    /datacommons/ydiaolab/arinze/ThreeD_STARRseq/dna_libPrep_optimization/onetwenty_ng_trial/demultiplex/AO80_GM_3DSTARR_DNA_R2R1_oldMethod_rep1_R1_001.fastq.gz    /datacommons/ydiaolab/arinze/ThreeD_STARRseq/dna_libPrep_optimization/onetwenty_ng_trial/demultiplex/AO80_GM_3DSTARR_DNA_R2R1_oldMethod_rep1_R2_001.fastq.gz
+GM_DNA_R2R1_rep2    /datacommons/ydiaolab/arinze/ThreeD_STARRseq/dna_libPrep_optimization/onetwenty_ng_trial/demultiplex/AO81_GM_3DSTARR_DNA_R2R1_oldMethod_rep2_R1_001.fastq.gz    /datacommons/ydiaolab/arinze/ThreeD_STARRseq/dna_libPrep_optimization/onetwenty_ng_trial/demultiplex/AO81_GM_3DSTARR_DNA_R2R1_oldMethod_rep2_R2_001.fastq.gz
+GM_DNA_R2R1_rep3   /cwork/aeo21/3D-STARRseq/dna_lib_demultiplex_May2024/AO109_GM_3DSTARRseq_DNA_R2R1_primExt_rep3_R1_001.fastq.gz   /cwork/aeo21/3D-STARRseq/dna_lib_demultiplex_May2024/AO109_GM_3DSTARRseq_DNA_R2R1_primExt_rep3_R2_001.fastq.gz

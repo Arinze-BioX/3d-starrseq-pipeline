@@ -1,0 +1,30 @@
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided remote nodes: 1
+Provided resources: mem_mb=28610, mem_mib=7630, disk_mb=16919, disk_mib=16136
+Select jobs to execute...
+Execute 1 jobs...
+
+[Sun Jul 21 03:12:25 2024]
+Job 0: select reads with correct orientation
+Reason: Forced execution
+
+cutadapt -Z -j 1 -e 0.16 --action none --discard-untrimmed -g ^ACANNNNTGTGCGAACTCAGACC -o 00_valid_fastq/GM_DNA_R2R1_rep3_valid_r1.fq.gz -p 00_valid_fastq/GM_DNA_R2R1_rep3_valid_r2.fq.gz /cwork/aeo21/3D-STARRseq/dna_lib_demultiplex_May2024/AO109_GM_3DSTARRseq_DNA_R2R1_primExt_rep3_R1_001.fastq.gz /cwork/aeo21/3D-STARRseq/cdna_H1_april2024/demultiplex/AO102_H1_3DSTARRseq_RNA_R2R1_rep2a_R2_001.fastq.gz 2> 00_log/GM_DNA_R2R1_rep3.removeadapt
+
+srun: fatal: SLURM_MEM_PER_CPU, SLURM_MEM_PER_GPU, and SLURM_MEM_PER_NODE are mutually exclusive.
+[Sun Jul 21 03:12:25 2024]
+Error in rule fastq_select_valid:
+    jobid: 0
+    input: /cwork/aeo21/3D-STARRseq/dna_lib_demultiplex_May2024/AO109_GM_3DSTARRseq_DNA_R2R1_primExt_rep3_R1_001.fastq.gz, /cwork/aeo21/3D-STARRseq/cdna_H1_april2024/demultiplex/AO102_H1_3DSTARRseq_RNA_R2R1_rep2a_R2_001.fastq.gz
+    output: 00_valid_fastq/GM_DNA_R2R1_rep3_valid_r1.fq.gz, 00_valid_fastq/GM_DNA_R2R1_rep3_valid_r2.fq.gz
+    log: 00_log/GM_DNA_R2R1_rep3.removeadapt (check log file(s) for error details)
+    shell:
+        cutadapt -Z -j 1 -e 0.16 --action none --discard-untrimmed -g ^ACANNNNTGTGCGAACTCAGACC -o 00_valid_fastq/GM_DNA_R2R1_rep3_valid_r1.fq.gz -p 00_valid_fastq/GM_DNA_R2R1_rep3_valid_r2.fq.gz /cwork/aeo21/3D-STARRseq/dna_lib_demultiplex_May2024/AO109_GM_3DSTARRseq_DNA_R2R1_primExt_rep3_R1_001.fastq.gz /cwork/aeo21/3D-STARRseq/cdna_H1_april2024/demultiplex/AO102_H1_3DSTARRseq_RNA_R2R1_rep2a_R2_001.fastq.gz 2> 00_log/GM_DNA_R2R1_rep3.removeadapt
+
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Shutting down, this might take some time.
+Exiting because a job execution failed. Look above for error message
+Storing output in storage.
+WorkflowError:
+At least one job did not complete successfully.
