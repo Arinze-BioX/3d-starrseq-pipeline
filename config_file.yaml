@@ -1,0 +1,8 @@
+BWA_INDEX: /datacommons/ydiaolab/genome_ref/hg38_BWA_index/hg38.fa
+frag_path: /datacommons/ydiaolab/arinze/ThreeD_STARRseq/new_genome_files/hg38_mse1.bed
+chromsizes : /datacommons/ydiaolab/genome_ref/hg38_BWA_index/hg38.chrom.sizes
+nla3_bed: /datacommons/ydiaolab/arinze/ThreeD_STARRseq/new_genome_files/hg38_nla3.bed
+genome: hg38
+cool_bin: 10000
+
+SAMPLES_JSON: './samples.json'

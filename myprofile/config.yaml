@@ -1,0 +1,18 @@
+executor: slurm
+latency-wait: 90
+configfile: "./config_file.yaml"
+
+cluster-generic-submit-cmd:
+  sbatch
+    --partition=common
+    --cpus-per-task={threads}
+    --mem=30G
+    --job-name=smk-{rule}-{wildcards}
+    --parsable
+    --account="gcb"
+
+default-resources:
+  - partition="common"
+  - mem="30G"
+
+

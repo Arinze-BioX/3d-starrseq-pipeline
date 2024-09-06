@@ -1,0 +1,17 @@
+00_log
+filtered-hg38
+*.log
+samples.json
+samples.tsv
+final_bed-hg38
+00_UMI_named_fq
+00_valid_fastq
+01_bam
+02_bam
+macs2_peak
+cluster.json
+pairs-hg38
+peaks-hg38
+coolers-hg38
+umicollapse_dedup
+dag.pdf

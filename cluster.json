@@ -2,17 +2,11 @@
     "__default__":
     {
         "job": "{rule}.{wildcards.sample}",
-        "mem": "20G",
+        "mem": "30G",
         "out": "cluster_log/{rule}.{wildcards.sample}.out",
-        "err": "cluster_log/{rule}.{wildcards.sample}.err"
-    },
-        "bwa_mem_mapping":
-    {
-        "mem": "30G"
-    },
-    "select_valid_pairs":
-    {
-        "mem": "30G"
+        "err": "cluster_log/{rule}.{wildcards.sample}.err",
+        "account" : "gcb",
+        "time" : "48:00:00",
+        "partition" : "common"
     }
-
 }

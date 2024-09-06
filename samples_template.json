@@ -1,0 +1,10 @@
+{
+    "Sample1": {
+        "R1":["/path/to/sample1_R1.fastq.gz"],
+        "R2":["/path/to/sample1_R2.fastq.gz"]
+    },
+    "Sample2": {
+        "R1":["/path/to/sample2_R1.fastq.gz"],
+        "R2":["/path/to/sample2_R2.fastq.gz"]
+    }
+}
