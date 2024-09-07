@@ -4,5 +4,12 @@ chromsizes : /datacommons/ydiaolab/genome_ref/hg38_BWA_index/hg38.chrom.sizes
 nla3_bed: /datacommons/ydiaolab/arinze/ThreeD_STARRseq/new_genome_files/hg38_nla3.bed
 genome: hg38
 cool_bin: 10000
+res: 10kb
+moustache_path: /datacommons/ydiaolab/arinze/ThreeD_STARRseq/moustache/mustache/mustache
+BIN500: /datacommons/ydiaolab/arinze/ThreeD_STARRseq/new_genome_files/tiles_hg38_500nt.bed
+database: mylocal_3dstarr_db
+inner_database: myinner_3dstarr_db
+db_username: run_3dstarr
+db_password: run_3dstarr
 
 SAMPLES_JSON: './samples.json'
