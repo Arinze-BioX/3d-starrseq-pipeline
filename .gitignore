@@ -14,4 +14,5 @@ pairs-hg38
 peaks-hg38
 coolers-hg38
 umicollapse_dedup
-dag.pdf
+binned_frags-hg38
+final_3dstarr
