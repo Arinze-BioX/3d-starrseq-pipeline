@@ -153,10 +153,6 @@ rule get_3dstarr_counts:
     log:
         "00_log/{sample}_{genome}_count_finalBed.bedtools_groupby"
     shell: """
-set +eu
-source /datacommons/ydiaolab/arinze/apps/miniconda_20220118/etc/profile.d/conda.sh
-conda activate bedtools
-set -eu
 zcat {input} | awk -F '[t]' ' /^[^#]/ {{ print $0 }}' |\
 bedtools groupby -g 2-7 -c 5 -o count |\
 awk '{{ print $1"\\t"$2"\\t"$5"\\t"$7"\\t"$1"_"$2"_"$3"_"$4"\\n"$3"\\t"$4"\\t"$6"\\t"$7"\\t"$1"_"$2"_"$3"_"$4 }}' |\
@@ -246,16 +242,6 @@ rule hic_call_contact_frequency_loops:
 python3 {params.moustache_path}/mustache.py -f {input} -r {params.res} -norm KR -pt 0.05 -o {output} 2> {log}
 """
 
-rule plot_3dstarr_fragment_metrics:
-    input: "final_bed-{genome}/{sample}_unique_pairs_with_counts.bedpe"
-    output: "coolers-{genome}/{sample}_new_loops.tsv"
-    message: "Plotting 3dstarrseq fragment metrics"
-    params: res = {res}, moustache_path = {moustache_path}
-    log: "00_log/{sample}_{genome}_plotFrags.R"
-    shell: """
-python3 {params.moustache_path}/mustache.py -f {input} -r {params.res} -norm KR -pt 0.05 -o {output} 2> {log}
-"""
-
 rule map_3dstarr_frags_to_500nt_bin:
     input: "final_bed-{genome}/{sample}_unique_pairs_with_counts.bedpe"
     output: "binned_frags-{genome}/{sample}_R1_500nt_bins.bed", 
@@ -264,8 +250,6 @@ rule map_3dstarr_frags_to_500nt_bin:
     params: BIN500 = {BIN500}
     log: "00_log/{sample}_{genome}_mapBins_500nt.bedtools"
     shell: """
-source /datacommons/ydiaolab/arinze/apps/miniconda_20220118/etc/profile.d/conda.sh
-conda activate bedtools
 awk '{{print $1"\\t"$2"\\t"$3"\\t"$7"\\t"$8}}' ${input} | bedtools intersect -a stdin -b ${params.BIN500} -wo > {output}[0]
 awk '{{print $4"\\t"$5"\\t"$6"\\t"$7"\\t"$8}}' ${input} | bedtools intersect -a stdin -b ${params.BIN500} -wo > {output}[1]
 """
@@ -278,8 +262,6 @@ rule map_3dstarr_frags_to_Nla3_frags:
     params: nla3_bed = {nla3_bed}
     log: "00_log/{sample}_{genome}_mapBins_nla3.bedtools"
     shell: """
-source /datacommons/ydiaolab/arinze/apps/miniconda_20220118/etc/profile.d/conda.sh
-conda activate bedtools
 awk '{{print $1"\\t"$2"\\t"$3"\\t"$7"\\t"$8}}' ${input} | bedtools intersect -a stdin -b ${params.nla3_bed} -wo > {output}[0]
 awk '{{print $4"\\t"$5"\\t"$6"\\t"$7"\\t"$8}}' ${input} | bedtools intersect -a stdin -b ${params.nla3_bed} -wo > {output}[1]
 """
@@ -322,9 +304,6 @@ rule add_3dstarr_bin_scores_500nt:
     message: "Make final 3dstarr pairs with score"
     log: "00_log/{sample}_{genome}_500nt_3dstarrScore.bedtools"
     shell: """
-source /datacommons/ydiaolab/arinze/apps/miniconda_20220118/etc/profile.d/conda.sh
-conda activate bedtools
-
 awk '{{ if (($3-$2) >= 500) {{a=500/($3-$2)}} else if (($3-$2) < 500) {{a=1}}
 if (($12-$11) >= 500) {{b=(500/($12-$11))}} else if (($12-$11) < 500) {{b=1}}
 {{x=((($9/500)*a*$5) + (($18/500)*b*$14))}}

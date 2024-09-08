@@ -1,10 +1,14 @@
-# HiCARTools
-This is the HiCAR datasets processing  pipeline from Diao lab. The pipeline is followed the [4DN HiC process pipeline](https://data.4dnucleome.org/resources/data-analysis/hi_c-processing-pipeline)  and is still in the development stage, please let us know of any bugs and how to improve!
+# The 3DSTARRseq Preprocessing Workflow
+--------------------------------------
+### Overview
+The 3DSTARRseq assay was designed to capture the functional readout of cREs in the context of their cell-type-specific 3D-interaction. It's a fusion of the [HiCAR assay](.https://www.sciencedirect.com/science/article/pii/S1097276522000983) and the classic [STARRseq assay](https://www.science.org/doi/10.1126/science.1232542).
 
-# Work flow of the pipeline
-![](./workflow.svg)
+This pipeline pre-processes raw fastq files to bin pairs and weighted (or unweighted) 3DSTARRseq counts in hdf5 file format. This file can then be further analyzed using the 3DSTARRsuite package.
 
-# Dependencies 
+### Work flow diagram of the pipeline
+![3DSTARRseq workflow](./dag.pdf)
+
+### Dependencies 
 HiCARTools requires following programs and packages. Please install them prior to using HiCARTools. HiCARTools runs on Linux.
 * python 3 version
 * [snakemake](https://snakemake.readthedocs.io/en/stable/) (workflow management) 5.28
