@@ -24,23 +24,35 @@ The following packages are directly used in this pipeline:
 * [umi_tools](https://umi-tools.readthedocs.io/en/latest/faq.html) 1.1.5
 * [moustache](https://github.com/ay-lab/mustache) 1.0.1
 
-These packages (those that aren't included among this repository) can be installed via conda using the environment.yml file present herein. Please install and run this pipeline using the step-by-step intructions below.
+These packages (those that aren't included in this repository) can be installed via conda using the environment.yml file present herein. Please install and run this pipeline using the step-by-step intructions below.
 
-### Installation
-Firslty, ensure conda is installed and initialized. Then install the packages in the environment.yml file as follows. 
+### Installation and preparation for running
+1. Ensure conda is installed on your linux machine (miniconda3 can be installed by following [these instructions](https://docs.conda.io/projects/conda/en/latest/user-guide/install/linux.html)) and initialized (by running `conda init`).
+
+2. Install `git` which will be used to clone the pipeline repository. Git can be installed by running:
+`conda install conda-forge::git`
+After git is installed, use git to clone the 3d-starrseq-pipeline repository and navigate into the cloned directory by running the following:
+```
+git clone https://github.com/Arinze-BioX/3d-starrseq-pipeline.git
+cd 3d-starrseq-pipeline
+```
+
+3. Within the repository directory is an `environment.yml` file. Install the packages in the yml file into a new conda envrironment by running the code below. 
 ```
 conda env create -n 3dstarrseq --file environment.yml
+conda activate 3dstarrseq
 ```
-You will also need the bwa index of your genome, which can be created via `bwa index [ref_genome_fastq_file]`.
 
-### How to run this pipeline.
-1. Obtain a copy of this workflow. `git clone https://github.com/Arinze-BioX/3d-starrseq-pipeline.git`
-2. Navigate into the `3d-starrseq-pipeline`folder and add the necessary data files to the data subfolder. Data files include Mse1-digested genome fragments file, Nla3-digested genome fragment file, and the binned genome file (using 500nt as the default bin size, but this can be changed). The restriction enzyme-digested genome fragments file can be created by cooler via
- `cooler digest -o output.bed CHROMSIZES_PATH FASTA_PATH ENZYME`
-The genome bin file can be created by
-3. Edit the config_file.yaml file to add the data files that you have just created. 
-4. Create sample information meta file in the json format.
-e.g. 
+4. Make the index of your genome of interest by running: `bwa index -p [reference_genome_fasta_file]`. Various reference genome fasta files can be downloaded from [UCSC](https://hgdownload.soe.ucsc.edu/downloads.html) using `wget [link_to_reference_genome_fasta_file]` if wget is your referred downloader (an alternative is `curl`).
+
+5. Add the necessary data files needed for this pipeleine into the `./data/` subfolder. Data files include Mse1-digested genome fragments file, Nla3-digested genome fragment file, and the binned genome file (using 500nt as the default bin size, but this can be changed). The restriction enzyme-digested genome fragments file (for Mse1 and Nla3) can be created by cooler via
+ `cooler digest -o output_[enzyme].bed CHROMSIZES_PATH FASTA_PATH ENZYME`
+Recall that the FASTA and CHROMSIZES files needed to run the above code will be in the directory of your created bwa index. The binned genome bed file can also be created separately or downloaded.
+
+### Running the pipeline
+1. Edit the `config_file.yaml` within the 3d-starrseq-pipeline directory by adding the correct paths to all the needed files. Other parameters such as the reference genome (e.g. hg38, mm10) and the resolution/bin size for the hic interaction matrix, can also be edited.
+2. Also edit the `myprofile/config.yaml` file by inputing the needed details for the distributed execution of the pipeline on a hpc platform according to the specifications detailed here.
+3. Edit the `samples.json` file by entering the sample name and paths to the sample fastq files. Please see an exaple of the json formatted sample details below. 
 ```
 {
     "sample1": {
@@ -53,16 +65,20 @@ e.g.
     }
 }
 ```
-4. update the path to bwa index and restriction fragments files in the config.yaml file.
-5. run the snakemake workflow via `snakemake  -p -s HiCARTools -j [NO.of.CPU]`
-6. you can also run the job on HPC cluster scheduler. example for the SLURM system.
+4. Edit the `run_snake.sh` file by replacing lines 3 and 4 with the following 2 lines of code:
 ```
-snakemake --latency-wait 90 -p -s HiCARTools -j 99 --cluster-config cluster.json \
---cluster "sbatch -J {cluster.job} --mem={cluster.mem} -N 1 -n {threads} -o {cluster.out} -e {cluster.err}
+source [path/to/your/miniconda/etc/profile.d/conda.sh]
+conda activate [your_3dstarrseq_conda_environment]
 ```
+5. Now, start the pipeline by running `./run_snake.sh`.
 
 ### Output files: 
-#### 1. [pairs](https://pairtools.readthedocs.io/en/latest/formats.html) containing a list of valid contacts.
+This pipeline produces 3 main groups of outputs:
+- HiC-type interaction frequency matrix (in .cool format).
+- The chromatin accessibility (atacseq) component of the HiCAR data.
+- The bin-pair counts for further downstream analyses specific to the 3dstarrseq functional assay.
+
+#### 1. [interaction frquency pairs](https://pairtools.readthedocs.io/en/latest/formats.html) containing a list of valid contacts.
 ```
 Columns: 
 =======
@@ -78,6 +94,10 @@ Columns:
 
 #### 3. ATAC peaks called by macs2.
 
-The RNA-seq library generated by HiCAR is standard bulk-RNA seq library, which can be analyzed by common used RNA-seq analysis pipeline, such as [SnakePipes](https://snakepipes.readthedocs.io/en/latest/content/workflows/mRNA-seq.html)
+#### 4. 3dstarrseq counts also in the same format as the cool file (hdf5 formatted).
 
-For any questions regarding HiCARTools please send mail to Arinze Okafor ( arinze.okafor@duke.edu )
+The 3dstarrseq counts file produced (with ".cool" extension) will then be used as input into the 3dstarrsuite package for more downstream 3dstarrseq-specific analyses.
+
+Other intermediate files and metrics are also produced for the user to explore.
+
+For any questions regarding this pipeline or the 3dstarrseq assay, please send an email to Arinze Okafor (arinze.okafor@duke.edu)

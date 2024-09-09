@@ -1,6 +1,6 @@
-BWA_INDEX: ./data/hg38.fa
+BWA_INDEX: /datacommons/ydiaolab/genome_ref/hg38_BWA_index/hg38.fa
 frag_path: ./data/hg38_mse1.bed
-chromsizes : ./data/hg38.chrom.sizes
+chromsizes : /datacommons/ydiaolab/genome_ref/hg38_BWA_index/hg38.chrom.sizes
 nla3_bed: ./data/hg38_nla3.bed
 genome: hg38
 cool_bin: 10000
