@@ -46,7 +46,9 @@ conda activate 3dstarrseq
 4. Make the index of your genome of interest by running: `bwa index -p [reference_genome_fasta_file]`. Various reference genome fasta files can be downloaded from [UCSC](https://hgdownload.soe.ucsc.edu/downloads.html) using `wget [link_to_reference_genome_fasta_file]` if wget is your referred downloader (an alternative is `curl`).
 
 5. Add the necessary data files needed for this pipeleine into the `./data/` subfolder. Data files include Mse1-digested genome fragments file, Nla3-digested genome fragment file, and the binned genome file (using 500nt as the default bin size, but this can be changed). The restriction enzyme-digested genome fragments file (for Mse1 and Nla3) can be created by cooler via
+
 ```cooler digest -o output_[enzyme].bed CHROMSIZES_PATH FASTA_PATH ENZYME```
+
 Recall that the FASTA and CHROMSIZES files needed to run the above code will be in the directory of your created bwa index. The binned genome bed file can also be created separately or downloaded.
 
 ### Running the pipeline
@@ -90,7 +92,7 @@ Columns:
 6) strand1
 7) strand1
 ```
-#### 2. [cooler](https://cooler.readthedocs.io/en/latest/datamodel.html), genomically-labeled sparse 2D matrices, which can be viewed by [HiGlass](https://docs.higlass.io). The chromatin interaction can be further identified using [MAPS](https://github.com/ijuric/MAPS).
+#### 2. [cooler](https://cooler.readthedocs.io/en/latest/datamodel.html), genomically-labeled sparse 2D matrices, which can be viewed by [HiGlass](https://docs.higlass.io). The chromatin interaction loops called from this file using [moustache](https://github.com/ay-lab/mustache) are also among the outputs.
 
 #### 3. ATAC peaks called by macs2.
 
