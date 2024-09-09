@@ -1,7 +1,7 @@
 # The 3DSTARRseq Preprocessing Workflow
 --------------------------------------
 ### Overview
-The 3DSTARRseq assay was designed to capture the functional readout of cREs in the context of their cell-type-specific 3D-interaction. It's a fusion of the [HiCAR assay](.https://www.sciencedirect.com/science/article/pii/S1097276522000983) and the classic [STARRseq assay](https://www.science.org/doi/10.1126/science.1232542).
+The 3DSTARRseq assay was designed to capture the functional readout of cREs in the context of their cell-type-specific 3D-interaction. It's a fusion of the [HiCAR assay](https://www.sciencedirect.com/science/article/pii/S1097276522000983) and the classic [STARRseq assay](https://www.science.org/doi/10.1126/science.1232542).
 
 This pipeline pre-processes raw fastq files to bin pairs and weighted (or unweighted) 3DSTARRseq counts in hdf5 file format. This file can then be further analyzed using the 3DSTARRsuite package.
 
