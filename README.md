@@ -6,37 +6,40 @@ The 3DSTARRseq assay was designed to capture the functional readout of cREs in t
 This pipeline pre-processes raw fastq files to bin pairs and weighted (or unweighted) 3DSTARRseq counts in hdf5 file format. This file can then be further analyzed using the 3DSTARRsuite package.
 
 ### Work flow diagram of the pipeline
-![3DSTARRseq workflow](./dag.pdf)
+![3DSTARRseq workflow](./dag.png)
 
 ### Dependencies 
-HiCARTools requires following programs and packages. Please install them prior to using HiCARTools. HiCARTools runs on Linux.
-* python 3 version
-* [snakemake](https://snakemake.readthedocs.io/en/stable/) (workflow management) 5.28
-* [cutadaptor](https://cutadapt.readthedocs.io/en/stable/) 3.0
-* [BWA](http://bio-bwa.sourceforge.net)  0.7.1
-* [samtools](http://www.htslib.org/download/) 1.1
-* [pairstool](https://pairtools.readthedocs.io/en/latest/installation.html)  0.3
-* [pairix](https://github.com/4dn-dcic/pairix#installation-for-pairix) 0.3.7
-* [cooler](https://github.com/open2c/cooler) 0.8
-* [macs2](https://github.com/macs3-project/MACS) 2.2.7
+The following packages are directly used in this pipeline:
+* python version 3.11.9
+* [snakemake](https://snakemake.readthedocs.io/en/stable/) (workflow management) 8.16.0
+* [cutadaptor](https://cutadapt.readthedocs.io/en/stable/) 4.9
+* [bedtools](https://bedtools.readthedocs.io/en/latest/index.html) 2.31.1
+* [BWA](http://bio-bwa.sourceforge.net)  0.7.18
+* [samtools](http://www.htslib.org/download/) 1.20
+* [pairstool](https://pairtools.readthedocs.io/en/latest/installation.html)  1.1.0
+* [pairix](https://github.com/4dn-dcic/pairix#installation-for-pairix) 0.3.8
+* [postgresql](https://www.postgresql.org/docs/16/release-16-4.html) 16.4
+* [cooler](https://github.com/open2c/cooler) 0.10.2
+* [macs2](https://github.com/macs3-project/MACS) 2.2.9.1
+* [umi_tools](https://umi-tools.readthedocs.io/en/latest/faq.html) 1.1.5
+* [moustache](https://github.com/ay-lab/mustache) 1.0.1
 
+These packages (those that aren't included among this repository) can be installed via conda using the environment.yml file present herein. Please install and run this pipeline using the step-by-step intructions below.
 
-# Installation
-Install the snakemake first via conda. The default conda solver is a bit slow and sometimes has issues with selecting the latest package releases. Therefore, It is recommend to install Mamba as a drop-in replacement via 
+### Installation
+Firslty, ensure conda is installed and initialized. Then install the packages in the environment.yml file as follows. 
 ```
-conda install -c conda-forge mamba
-mamba install -c bioconda -c conda-forge snakemake-minimal 
+conda env create -n 3dstarrseq --file environment.yml
 ```
-Install other dependencies and add them to the path.
 You will also need the bwa index of your genome, which can be created via `bwa index [ref_genome_fastq_file]`.
-The genome restriction fragments file can be created by cooler via
+
+### How to run this pipeline.
+1. Obtain a copy of this workflow. `git clone https://github.com/Arinze-BioX/3d-starrseq-pipeline.git`
+2. Navigate into the `3d-starrseq-pipeline`folder and add the necessary data files to the data subfolder. Data files include Mse1-digested genome fragments file, Nla3-digested genome fragment file, and the binned genome file (using 500nt as the default bin size, but this can be changed). The restriction enzyme-digested genome fragments file can be created by cooler via
  `cooler digest -o output.bed CHROMSIZES_PATH FASTA_PATH ENZYME`
-
-
-# How to run the workflow.
-1. Obtain a copy of this workflow. `git clone https://github.com/diao-lab/HiCARTools.git`
-2. Inside `HiCARTools`folder, create a folder named `fastq`, and put all your .fastq files in that folder. 
-3. create sample information meta file in the json formate.
+The genome bin file can be created by
+3. Edit the config_file.yaml file to add the data files that you have just created. 
+4. Create sample information meta file in the json format.
 e.g. 
 ```
 {
@@ -58,8 +61,8 @@ snakemake --latency-wait 90 -p -s HiCARTools -j 99 --cluster-config cluster.json
 --cluster "sbatch -J {cluster.job} --mem={cluster.mem} -N 1 -n {threads} -o {cluster.out} -e {cluster.err}
 ```
 
-# Output files: 
-### 1. [pairs](https://pairtools.readthedocs.io/en/latest/formats.html) containing a list of valid contacts.
+### Output files: 
+#### 1. [pairs](https://pairtools.readthedocs.io/en/latest/formats.html) containing a list of valid contacts.
 ```
 Columns: 
 =======
@@ -71,12 +74,10 @@ Columns:
 6) strand1
 7) strand1
 ```
-### 2. [cooler](https://cooler.readthedocs.io/en/latest/datamodel.html), genomically-labeled sparse 2D matrices, which can be viewed by [HiGlass](https://docs.higlass.io). The chromatin interaction can be further identified using [MAPS](https://github.com/ijuric/MAPS).
+#### 2. [cooler](https://cooler.readthedocs.io/en/latest/datamodel.html), genomically-labeled sparse 2D matrices, which can be viewed by [HiGlass](https://docs.higlass.io). The chromatin interaction can be further identified using [MAPS](https://github.com/ijuric/MAPS).
 
-### 3. ATAC peaks called by macs2.
+#### 3. ATAC peaks called by macs2.
 
 The RNA-seq library generated by HiCAR is standard bulk-RNA seq library, which can be analyzed by common used RNA-seq analysis pipeline, such as [SnakePipes](https://snakepipes.readthedocs.io/en/latest/content/workflows/mRNA-seq.html)
 
-For any questions regarding HiCARTools please send mail to Yu Xiang ( yu.xiang@duke.edu )
-
-
+For any questions regarding HiCARTools please send mail to Arinze Okafor ( arinze.okafor@duke.edu )

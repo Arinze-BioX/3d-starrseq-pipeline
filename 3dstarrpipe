@@ -24,7 +24,6 @@ bin_type    = ["nla3", "500nt"]
 database    = config['database']
 inner_database =config['inner_database']
 db_uname    = config['db_username']
-db_password = config['db_password']
 
 TARGETS = []
 peaks  = expand("macs2_peak/{sample}_{genome}_peaks.narrowPeak" , sample = SAMPLES, genome = genome)
@@ -275,7 +274,7 @@ rule combine_3dstarr_bin_pairs:
     log: "00_log/{sample}_{genome}_{bin_type}_CombineBins.python"
     resources:
         mem="150G"
-    params: db = {database}, inner_db = {inner_database}, db_uname = {db_uname}, db_password = {db_password}
+    params: db = {database}, inner_db = {inner_database}, db_uname = {db_uname}
     shell: """
 if [ psql -lqt | cut -d | -f 1 | grep -qw {params.db} ]; then
 echo “The specified database {params.db} already exsists. Creating user and password.”
