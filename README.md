@@ -23,6 +23,7 @@ The following packages are directly used in this pipeline:
 * [macs2](https://github.com/macs3-project/MACS) 2.2.9.1
 * [umi_tools](https://umi-tools.readthedocs.io/en/latest/faq.html) 1.1.5
 * [moustache](https://github.com/ay-lab/mustache) 1.0.1
+* [psycopg2-binary](https://pypi.org/project/psycopg2/) 2.9.9
 
 These packages (those that aren't included in this repository) can be installed via conda using the environment.yml file present herein. Please install and run this pipeline using the step-by-step intructions below.
 

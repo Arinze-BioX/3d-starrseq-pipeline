@@ -7,4 +7,4 @@ timestamp=$(date +%Y-%m-%d_%H-%M-%S)
 filename="trial_${timestamp}.log"
 
 snakemake -p --snakefile 3dstarrpipe --profile myprofile --rerun-incomplete \
---touch --jobs 99 --keep-going 2> "${filename}"
+--jobs 99 --keep-going 2> "${filename}"

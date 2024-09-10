@@ -1,12 +1,12 @@
 BWA_INDEX: /datacommons/ydiaolab/genome_ref/hg38_BWA_index/hg38.fa
-frag_path: ./data/hg38_mse1.bed
+frag_path: data/hg38_mse1.bed
 chromsizes : /datacommons/ydiaolab/genome_ref/hg38_BWA_index/hg38.chrom.sizes
-nla3_bed: ./data/hg38_nla3.bed
+nla3_bed: data/hg38_nla3.bed
 genome: hg38
 cool_bin: 10000
 res: 10kb
 moustache_path: ./moustache/mustache/mustache
-BIN500: ./data/tiles_hg38_500nt.bed
+BIN500: data/tiles_hg38_500nt.bed
 database: mylocal_3dstarr_db
 inner_database: myinner_3dstarr_db
 db_username: run_3dstarr

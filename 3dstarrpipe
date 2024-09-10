@@ -246,11 +246,17 @@ rule map_3dstarr_frags_to_500nt_bin:
     output: "binned_frags-{genome}/{sample}_R1_500nt_bins.bed", 
             "binned_frags-{genome}/{sample}_R2_500nt_bins.bed"
     message: "Map 3D-STARRseq counts to 500nt genome bins"
-    params: BIN500 = {BIN500}
+    params: BIN500 = {BIN500}, genome = {genome}
     log: "00_log/{sample}_{genome}_mapBins_500nt.bedtools"
     shell: """
-awk '{{print $1"\\t"$2"\\t"$3"\\t"$7"\\t"$8}}' ${input} | bedtools intersect -a stdin -b ${params.BIN500} -wo > {output}[0]
-awk '{{print $4"\\t"$5"\\t"$6"\\t"$7"\\t"$8}}' ${input} | bedtools intersect -a stdin -b ${params.BIN500} -wo > {output}[1]
+    if [ ! -d binned_frags-{params.genome} ]
+then
+     mkdir binned_frags-{params.genome}
+else
+     echo "Directory exists"
+fi
+awk '{{print $1"\\t"$2"\\t"$3"\\t"$7"\\t"$8}}' {input} | bedtools intersect -a stdin -b {params.BIN500} -wo > {output[0]} 2> {log}
+awk '{{print $4"\\t"$5"\\t"$6"\\t"$7"\\t"$8}}' {input} | bedtools intersect -a stdin -b {params.BIN500} -wo > {output[1]} 2> {log}
 """
 
 rule map_3dstarr_frags_to_Nla3_frags:
@@ -261,8 +267,8 @@ rule map_3dstarr_frags_to_Nla3_frags:
     params: nla3_bed = {nla3_bed}
     log: "00_log/{sample}_{genome}_mapBins_nla3.bedtools"
     shell: """
-awk '{{print $1"\\t"$2"\\t"$3"\\t"$7"\\t"$8}}' ${input} | bedtools intersect -a stdin -b ${params.nla3_bed} -wo > {output}[0]
-awk '{{print $4"\\t"$5"\\t"$6"\\t"$7"\\t"$8}}' ${input} | bedtools intersect -a stdin -b ${params.nla3_bed} -wo > {output}[1]
+awk '{{print $1"\\t"$2"\\t"$3"\\t"$7"\\t"$8}}' {input} | bedtools intersect -a stdin -b {params.nla3_bed} -wo > {output[0]} 2> {log}
+awk '{{print $4"\\t"$5"\\t"$6"\\t"$7"\\t"$8}}' {input} | bedtools intersect -a stdin -b {params.nla3_bed} -wo > {output[1]} 2> {log}
 """
 
 
@@ -293,8 +299,7 @@ createuser --encrypted {params.db_uname}
 createdb --owner={params.db_uname} {params.inner_db}
 fi
 
-./combine_bin_pairs_postgre.py --frag1 {input}[0] --frag2 {input}[1] \
---output {ouput} --database {params.inner_db} --db_username {params.db_uname}
+./combine_bin_pairs_postgre.py --frag1 {input[0]} --frag2 {input[1]} --output {output} --database {params.inner_db} --db_username {params.db_uname} 2> {log}
 """
 
 rule add_3dstarr_bin_scores_500nt:
@@ -303,11 +308,17 @@ rule add_3dstarr_bin_scores_500nt:
     message: "Make final 3dstarr pairs with score"
     log: "00_log/{sample}_{genome}_500nt_3dstarrScore.bedtools"
     shell: """
+    if [ ! -d cool_3dstarr ]
+then
+     mkdir cool_3dstarr
+else
+     echo "Directory exists"
+fi
 awk '{{ if (($3-$2) >= 500) {{a=500/($3-$2)}} else if (($3-$2) < 500) {{a=1}}
 if (($12-$11) >= 500) {{b=(500/($12-$11))}} else if (($12-$11) < 500) {{b=1}}
 {{x=((($9/500)*a*$5) + (($18/500)*b*$14))}}
 {{print $6"\\t"$7"\\t"$8"\\t"$15"\\t"$16"\\t"$17"\\t"x}}' {input} | \
-sort -k1,1 -k2,2 -k3,3 -k4,4 -k5,5 -k6,6 | bedtools groupby -g 1,2,3,4,5,6 -c 7 -o sum > {output}
+sort -k1,1 -k2,2 -k3,3 -k4,4 -k5,5 -k6,6 | bedtools groupby -g 1,2,3,4,5,6 -c 7 -o sum > {output} 2> {log}
 """
 
 rule make_3dstarr_cool:
@@ -317,14 +328,14 @@ rule make_3dstarr_cool:
     log: "00_log/{sample}_{genome}_500nt_3dstarrCool.cooler"
     params: BIN500={BIN500}
     shell: """
-cooler load -f bg2 --assembly hg38 --count-as-float --no-symmetric-upper {params.BIN500} {input} {ouput}
+cooler load -f bg2 --assembly hg38 --count-as-float --no-symmetric-upper {params.BIN500} {input} {output} 2> {log}
 """
 
 rule add_multiple_3dstarr_resolutions:
     input: "cool_3dstarr/final_{sample}_{genome}_500nt.cool"
-    output: "cool_3dstarr/final_{sample}_{genome}_500nt.mcool"
+    output: ensure("cool_3dstarr/final_{sample}_{genome}_500nt.mcool")
     message: "Add multiple resolutions to 3dstarr cool file"
     log: "00_log/{sample}_{genome}_500nt_3dstarrMCool.cooler"
     shell: """
-cooler zoomify -r 2000,5000,10000,50000,100000 {input} -o {output}
+cooler zoomify -r 2000,5000,10000,50000,100000 {input} -o {output} 2> {log}
 """

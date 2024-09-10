@@ -20,3 +20,7 @@ data/hg38.fa
 data/hg38_mse1.bed
 data/hg38_nla3.bed
 data/tiles_hg38_500nt.bed
+mylocal_3dstarr_db
+mylocal_3dstarr_db/*
+.snakemake/metadata/*
+.snakemake/slurm_logs/*
