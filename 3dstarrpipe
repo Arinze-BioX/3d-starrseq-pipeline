@@ -260,26 +260,22 @@ awk '{{print $4"\\t"$5"\\t"$6"\\t"$7"\\t"$8}}' {input} | bedtools intersect -a s
 """
 
 rule map_3dstarr_frags_to_Nla3_frags:
-    input: "final_bed-{genome}/{sample}_unique_pairs_with_counts.bedpe"
-    output: "binned_frags-{genome}/{sample}_R1_nla3_bins.bed", 
-            "binned_frags-{genome}/{sample}_R2_nla3_bins.bed"
+    input: expand("final_bed-{genome}/{sample}_unique_pairs_with_counts.bedpe", sample = SAMPLES, genome = genome)
+    output: expand("binned_frags-{genome}/{sample}_R1_nla3_bins.bed", sample = SAMPLES, genome = genome), 
+            expand("binned_frags-{genome}/{sample}_R2_nla3_bins.bed", sample = SAMPLES, genome = genome),
+            "binned_genome.txt"
     message: "Map 3D-STARRseq counts to Nla3_frags"
     params: nla3_bed = {nla3_bed}
-    log: "00_log/{sample}_{genome}_mapBins_nla3.bedtools"
+    log: expand("00_log/{sample}_{genome}_mapBins_nla3.bedtools", sample = SAMPLES, genome = genome)
     shell: """
 awk '{{print $1"\\t"$2"\\t"$3"\\t"$7"\\t"$8}}' {input} | bedtools intersect -a stdin -b {params.nla3_bed} -wo > {output[0]} 2> {log}
 awk '{{print $4"\\t"$5"\\t"$6"\\t"$7"\\t"$8}}' {input} | bedtools intersect -a stdin -b {params.nla3_bed} -wo > {output[1]} 2> {log}
+touch {output[2]}
 """
 
-
-rule combine_3dstarr_bin_pairs:
-    input:  expand("binned_frags-{genome}/{sample}_R1_{bin_type}_bins.bed", sample = SAMPLES, genome = genome, bin_type = bin_type), 
-            expand("binned_frags-{genome}/{sample}_R2_{bin_type}_bins.bed", sample = SAMPLES, genome = genome, bin_type = bin_type)
-    output: "binned_frags-{genome}/{sample}_{bin_type}_bin_pairs.bedpe"
-    message: "Combine bin pairs after mapping to bins"
-    log: "00_log/{sample}_{genome}_{bin_type}_CombineBins.python"
-    resources:
-        mem="150G"
+rule start_postgre_server:
+    input: "binned_genome.txt"
+    output: "server_started.txt"
     params: db = {database}, db_password = {db_password}, db_uname = {db_uname}
     shell: """
 if [ psql -lqt | cut -d | -f 1 | grep -qw {params.db} ]; then
@@ -299,12 +295,35 @@ fi
 
 createdb --owner={params.db_uname} {params.inner_db}
 psql -U {params.db_uname} {params.inner_db} -c "ALTER ROLE {params.db_uname} WITH PASSWORD '{params.db_password}';"
-./combine_bin_pairs_postgre.py --frag1 {input[0]} --frag2 {input[1]} --output {output} --database {database} --db_username {params.db_uname} --db_password {params.db_password} 2> {log}
+touch {output}
+"""
+
+rule combine_3dstarr_bin_pairs:
+    input:  expand("binned_frags-{genome}/{sample}_R1_500nt_bins.bed", sample = SAMPLES, genome = genome), 
+            expand("binned_frags-{genome}/{sample}_R2_500nt_bins.bed", sample = SAMPLES, genome = genome),
+            "server_started.txt"
+    output: expand("binned_frags-{genome}/{sample}_500nt_bin_pairs.bedpe", sample = SAMPLES, genome = genome), "combined_bins.txt"
+    message: "Combine bin pairs after mapping to bins"
+    log: expand("00_log/{sample}_{genome}_500nt_CombineBins.python", sample = SAMPLES, genome = genome)
+    resources:
+        mem="150G"
+    params: db = {database}, db_password = {db_password}, db_uname = {db_uname}
+    shell: """
+./combine_bin_pairs_postgre.py --frag1 {input[0]} --frag2 {input[1]} --output {output[0]} --database {params.db} --db_username {params.db_uname} --db_password {params.db_password} 2> {log}
+touch {output[1]}
+"""
+
+rule end_postgre_server:
+    input: "combined_bins.txt"
+    output: "closed_server.txt"
+    params: db = {database}, db_password = {db_password}, db_uname = {db_uname}
+    shell: """
 pg_ctl -D {params.db} stop
+touch {output}
 """
 
 rule add_3dstarr_bin_scores_500nt:
-    input: "binned_frags-{genome}/{sample}_500nt_bin_pairs.bedpe"
+    input: expand("binned_frags-{genome}/{sample}_500nt_bin_pairs.bedpe", sample = SAMPLES, genome = genome), "closed_server.txt"
     output: "cool_3dstarr/final_{sample}_{genome}_500nt.bedpe"
     message: "Make final 3dstarr pairs with score"
     log: "00_log/{sample}_{genome}_500nt_3dstarrScore.bedtools"
@@ -318,7 +337,7 @@ fi
 awk '{{ if (($3-$2) >= 500) {{a=500/($3-$2)}} else if (($3-$2) < 500) {{a=1}}
 if (($12-$11) >= 500) {{b=(500/($12-$11))}} else if (($12-$11) < 500) {{b=1}}
 {{x=((($9/500)*a*$5) + (($18/500)*b*$14))}}
-{{print $6"\\t"$7"\\t"$8"\\t"$15"\\t"$16"\\t"$17"\\t"x}}' {input} | \
+{{print $6"\\t"$7"\\t"$8"\\t"$15"\\t"$16"\\t"$17"\\t"x}}' {input[0]} | \
 sort -k1,1 -k2,2 -k3,3 -k4,4 -k5,5 -k6,6 | bedtools groupby -g 1,2,3,4,5,6 -c 7 -o sum > {output} 2> {log}
 """
 
