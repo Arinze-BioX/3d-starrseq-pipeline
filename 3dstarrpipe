@@ -24,6 +24,7 @@ bin_type    = ["nla3", "500nt"]
 database    = config['database']
 db_uname    = config['db_username']
 db_password = config['db_password']
+inner_db    = config['inner_db']
 
 TARGETS = []
 peaks  = expand("macs2_peak/{sample}_{genome}_peaks.narrowPeak" , sample = SAMPLES, genome = genome)
@@ -245,6 +246,7 @@ rule map_3dstarr_frags_to_500nt_bin:
     input: "final_bed-{genome}/{sample}_unique_pairs_with_counts.bedpe"
     output: "binned_frags-{genome}/{sample}_R1_500nt_bins.bed", 
             "binned_frags-{genome}/{sample}_R2_500nt_bins.bed"
+    priority: 99
     message: "Map 3D-STARRseq counts to 500nt genome bins"
     params: BIN500 = {BIN500}, genome = {genome}
     log: "00_log/{sample}_{genome}_mapBins_500nt.bedtools"
@@ -260,23 +262,21 @@ awk '{{print $4"\\t"$5"\\t"$6"\\t"$7"\\t"$8}}' {input} | bedtools intersect -a s
 """
 
 rule map_3dstarr_frags_to_Nla3_frags:
-    input: expand("final_bed-{genome}/{sample}_unique_pairs_with_counts.bedpe", sample = SAMPLES, genome = genome)
-    output: expand("binned_frags-{genome}/{sample}_R1_nla3_bins.bed", sample = SAMPLES, genome = genome), 
-            expand("binned_frags-{genome}/{sample}_R2_nla3_bins.bed", sample = SAMPLES, genome = genome),
-            "binned_genome.txt"
+    input: "final_bed-{genome}/{sample}_unique_pairs_with_counts.bedpe"
+    output: "binned_frags-{genome}/{sample}_R1_nla3_bins.bed", 
+            "binned_frags-{genome}/{sample}_R2_nla3_bins.bed"
     message: "Map 3D-STARRseq counts to Nla3_frags"
     params: nla3_bed = {nla3_bed}
-    log: expand("00_log/{sample}_{genome}_mapBins_nla3.bedtools", sample = SAMPLES, genome = genome)
+    log: "00_log/{sample}_{genome}_mapBins_nla3.bedtools"
     shell: """
 awk '{{print $1"\\t"$2"\\t"$3"\\t"$7"\\t"$8}}' {input} | bedtools intersect -a stdin -b {params.nla3_bed} -wo > {output[0]} 2> {log}
 awk '{{print $4"\\t"$5"\\t"$6"\\t"$7"\\t"$8}}' {input} | bedtools intersect -a stdin -b {params.nla3_bed} -wo > {output[1]} 2> {log}
-touch {output[2]}
 """
 
 rule start_postgre_server:
-    input: "binned_genome.txt"
     output: "server_started.txt"
-    params: db = {database}, db_password = {db_password}, db_uname = {db_uname}
+    priority: 98
+    params: db = {database}, db_password = {db_password}, db_uname = {db_uname}, inner_db = {inner_db}
     shell: """
 if [ psql -lqt | cut -d | -f 1 | grep -qw {params.db} ]; then
 echo “The specified database {params.db} already exsists. Creating user and inner database.”
@@ -299,24 +299,24 @@ touch {output}
 """
 
 rule combine_3dstarr_bin_pairs:
-    input:  expand("binned_frags-{genome}/{sample}_R1_500nt_bins.bed", sample = SAMPLES, genome = genome), 
-            expand("binned_frags-{genome}/{sample}_R2_500nt_bins.bed", sample = SAMPLES, genome = genome),
+    input:  "binned_frags-{genome}/{sample}_R1_500nt_bins.bed", 
+            "binned_frags-{genome}/{sample}_R2_500nt_bins.bed",
             "server_started.txt"
-    output: expand("binned_frags-{genome}/{sample}_500nt_bin_pairs.bedpe", sample = SAMPLES, genome = genome), "combined_bins.txt"
+    output: "binned_frags-{genome}/{sample}_500nt_bin_pairs.bedpe"
     message: "Combine bin pairs after mapping to bins"
-    log: expand("00_log/{sample}_{genome}_500nt_CombineBins.python", sample = SAMPLES, genome = genome)
+    log: "00_log/{sample}_{genome}_500nt_CombineBins.python"
+    priority: 97
     resources:
         mem="150G"
     params: db = {database}, db_password = {db_password}, db_uname = {db_uname}
     shell: """
 ./combine_bin_pairs_postgre.py --frag1 {input[0]} --frag2 {input[1]} --output {output[0]} --database {params.db} --db_username {params.db_uname} --db_password {params.db_password} 2> {log}
-touch {output[1]}
 """
 
 rule end_postgre_server:
-    input: "combined_bins.txt"
     output: "closed_server.txt"
-    params: db = {database}, db_password = {db_password}, db_uname = {db_uname}
+    priority: 96
+    params: db = {database}
     shell: """
 pg_ctl -D {params.db} stop
 touch {output}

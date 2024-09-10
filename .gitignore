@@ -23,4 +23,6 @@ data/tiles_hg38_500nt.bed
 mylocal_3dstarr_db
 mylocal_3dstarr_db/*
 .snakemake/metadata/*
+.snakemake/incomplete/*
 .snakemake/slurm_logs/*
+logfile

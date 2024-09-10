@@ -8,7 +8,7 @@ res: 10kb
 moustache_path: ./moustache/mustache/mustache
 BIN500: data/tiles_hg38_500nt.bed
 database: mylocal_3dstarr_db
-inner_database: myinner_3dstarr_db
+inner_db: myinner_3dstarr_db
 db_username: run_3dstarr
 db_password: run_3dstarr
 
