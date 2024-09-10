@@ -22,8 +22,8 @@ moustache_path = config['moustache_path']
 BIN500      = config['BIN500']
 bin_type    = ["nla3", "500nt"]
 database    = config['database']
-inner_database =config['inner_database']
 db_uname    = config['db_username']
+db_password = config['db_password']
 
 TARGETS = []
 peaks  = expand("macs2_peak/{sample}_{genome}_peaks.narrowPeak" , sample = SAMPLES, genome = genome)
@@ -280,26 +280,27 @@ rule combine_3dstarr_bin_pairs:
     log: "00_log/{sample}_{genome}_{bin_type}_CombineBins.python"
     resources:
         mem="150G"
-    params: db = {database}, inner_db = {inner_database}, db_uname = {db_uname}
+    params: db = {database}, db_password = {db_password}, db_uname = {db_uname}
     shell: """
 if [ psql -lqt | cut -d | -f 1 | grep -qw {params.db} ]; then
-echo “The specified database {params.db} already exsists. Creating user and password.”
+echo “The specified database {params.db} already exsists. Creating user and inner database.”
 else
 echo “The specified database {params.db} does not exist. Creating it now”
 initdb -D {params.db}
 pg_ctl -D {params.db} -l logfile start
 fi
 
-if psql postgres -tAc “SELECT 1 FROM pg_roles WHERE rolname={params.db_uname}” | grep -q 1; then
+if psql postgres -tXAc "SELECT 1 FROM pg_roles WHERE rolname={params.db_uname}” | grep -q 1; then
 echo “The database user {params.db_uname} already exists. Creating inner db now”
-createdb --owner={params.db_uname} {params.inner_db}
 else
 echo “The user {params.db_uname} does not exist. Creating user and inner db.”
 createuser --encrypted {params.db_uname}
-createdb --owner={params.db_uname} {params.inner_db}
 fi
 
-./combine_bin_pairs_postgre.py --frag1 {input[0]} --frag2 {input[1]} --output {output} --database {params.inner_db} --db_username {params.db_uname} 2> {log}
+createdb --owner={params.db_uname} {params.inner_db}
+psql -U {params.db_uname} {params.inner_db} -c "ALTER ROLE {params.db_uname} WITH PASSWORD '{params.db_password}';"
+./combine_bin_pairs_postgre.py --frag1 {input[0]} --frag2 {input[1]} --output {output} --database {database} --db_username {params.db_uname} --db_password {params.db_password} 2> {log}
+pg_ctl -D {params.db} stop
 """
 
 rule add_3dstarr_bin_scores_500nt:
