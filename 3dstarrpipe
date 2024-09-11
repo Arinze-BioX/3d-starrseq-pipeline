@@ -31,10 +31,12 @@ peaks  = expand("macs2_peak/{sample}_{genome}_peaks.narrowPeak" , sample = SAMPL
 cooler = expand("coolers-{genome}/{sample}.{cool_bin}.cool", sample = SAMPLES, genome = genome, cool_bin = cool_bin)
 final_mcool = expand("cool_3dstarr/final_{sample}_{genome}_500nt.mcool", sample = SAMPLES, genome = genome)
 nla3_pairs = expand("binned_frags-{genome}/{sample}_R1_nla3_bins.bed", sample = SAMPLES, genome = genome)
+hic_loops = expand("coolers-{genome}/{sample}.{cool_bin}_loops.tsv", sample = SAMPLES, genome = genome, cool_bin = cool_bin)
 TARGETS.extend(peaks)
 TARGETS.extend(cooler)
 TARGETS.extend(final_mcool)
 TARGETS.extend(nla3_pairs)
+TARGETS.extend(hic_loops)
 
 localrules: all
 
@@ -297,7 +299,7 @@ createuser --encrypted {params.db_uname}
 fi
 
 createdb --owner={params.db_uname} {params.inner_db}
-psql -U {params.db_uname} {params.inner_db} -c "ALTER ROLE {params.db_uname} WITH PASSWORD '{params.db_password}';"
+psql -U {params.db_uname} {params.inner_db} -c "ALTER ROLE {params.db_uname} WITH PASSWORD {params.db_password}"
 """
 
 rule combine_3dstarr_bin_pairs:
