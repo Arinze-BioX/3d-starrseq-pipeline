@@ -30,9 +30,11 @@ TARGETS = []
 peaks  = expand("macs2_peak/{sample}_{genome}_peaks.narrowPeak" , sample = SAMPLES, genome = genome)
 cooler = expand("coolers-{genome}/{sample}.{cool_bin}.cool", sample = SAMPLES, genome = genome, cool_bin = cool_bin)
 final_mcool = expand("cool_3dstarr/final_{sample}_{genome}_500nt.mcool", sample = SAMPLES, genome = genome)
+nla3_pairs = expand("binned_frags-{genome}/{sample}_R1_nla3_bins.bed", sample = SAMPLES, genome = genome)
 TARGETS.extend(peaks)
 TARGETS.extend(cooler)
 TARGETS.extend(final_mcool)
+TARGETS.extend(nla3_pairs)
 
 localrules: all
 
@@ -273,18 +275,19 @@ awk '{{print $1"\\t"$2"\\t"$3"\\t"$7"\\t"$8}}' {input} | bedtools intersect -a s
 awk '{{print $4"\\t"$5"\\t"$6"\\t"$7"\\t"$8}}' {input} | bedtools intersect -a stdin -b {params.nla3_bed} -wo > {output[1]} 2> {log}
 """
 
+def ensure_binPair_samples(wildcards):
+    return expand(
+        "binned_frags-{genome}/{sample}_R1_500nt_bins.bed",
+        sample = SAMPLES, genome = genome)
+
 rule start_postgre_server:
-    output: "server_started.txt"
-    priority: 98
+    input: ensure_binPair_samples
+    output: touch("server_started.txt")
     params: db = {database}, db_password = {db_password}, db_uname = {db_uname}, inner_db = {inner_db}
     shell: """
-if [ psql -lqt | cut -d | -f 1 | grep -qw {params.db} ]; then
-echo “The specified database {params.db} already exsists. Creating user and inner database.”
-else
-echo “The specified database {params.db} does not exist. Creating it now”
+touch started_running_server_code.txt
 initdb -D {params.db}
 pg_ctl -D {params.db} -l logfile start
-fi
 
 if psql postgres -tXAc "SELECT 1 FROM pg_roles WHERE rolname={params.db_uname}” | grep -q 1; then
 echo “The database user {params.db_uname} already exists. Creating inner db now”
@@ -295,7 +298,6 @@ fi
 
 createdb --owner={params.db_uname} {params.inner_db}
 psql -U {params.db_uname} {params.inner_db} -c "ALTER ROLE {params.db_uname} WITH PASSWORD '{params.db_password}';"
-touch {output}
 """
 
 rule combine_3dstarr_bin_pairs:
@@ -305,7 +307,6 @@ rule combine_3dstarr_bin_pairs:
     output: "binned_frags-{genome}/{sample}_500nt_bin_pairs.bedpe"
     message: "Combine bin pairs after mapping to bins"
     log: "00_log/{sample}_{genome}_500nt_CombineBins.python"
-    priority: 97
     resources:
         mem="150G"
     params: db = {database}, db_password = {db_password}, db_uname = {db_uname}
@@ -313,13 +314,17 @@ rule combine_3dstarr_bin_pairs:
 ./combine_bin_pairs_postgre.py --frag1 {input[0]} --frag2 {input[1]} --output {output[0]} --database {params.db} --db_username {params.db_uname} --db_password {params.db_password} 2> {log}
 """
 
+def ensure_combined_samples(wildcards):
+    return expand(
+        "binned_frags-{genome}/{sample}_500nt_bin_pairs.bedpe",
+        sample = SAMPLES, genome = genome)
+
 rule end_postgre_server:
-    output: "closed_server.txt"
-    priority: 96
+    input: ensure_combined_samples
+    output: touch("closed_server.txt")
     params: db = {database}
     shell: """
 pg_ctl -D {params.db} stop
-touch {output}
 """
 
 rule add_3dstarr_bin_scores_500nt:
