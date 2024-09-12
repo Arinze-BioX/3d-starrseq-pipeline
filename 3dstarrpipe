@@ -252,15 +252,9 @@ rule map_3dstarr_frags_to_500nt_bin:
             "binned_frags-{genome}/{sample}_R2_500nt_bins.bed"
     priority: 99
     message: "Map 3D-STARRseq counts to 500nt genome bins"
-    params: BIN500 = {BIN500}, genome = {genome}
+    params: BIN500 = {BIN500}
     log: "00_log/{sample}_{genome}_mapBins_500nt.bedtools"
     shell: """
-    if [ ! -d binned_frags-{params.genome} ]
-then
-     mkdir binned_frags-{params.genome}
-else
-     echo "Directory exists"
-fi
 awk '{{print $1"\\t"$2"\\t"$3"\\t"$7"\\t"$8}}' {input} | bedtools intersect -a stdin -b {params.BIN500} -wo > {output[0]} 2> {log}
 awk '{{print $4"\\t"$5"\\t"$6"\\t"$7"\\t"$8}}' {input} | bedtools intersect -a stdin -b {params.BIN500} -wo > {output[1]} 2> {log}
 """
@@ -321,21 +315,12 @@ pg_ctl -D {params.db} stop || echo "server already stopped"
 """
 
 rule add_3dstarr_bin_scores_500nt:
-    input: expand("binned_frags-{genome}/{sample}_500nt_bin_pairs.bedpe", sample = SAMPLES, genome = genome), "closed_server.txt"
+    input: "binned_frags-{genome}/{sample}_500nt_bin_pairs.bedpe", "closed_server.txt"
     output: "cool_3dstarr/final_{sample}_{genome}_500nt.bedpe"
     message: "Make final 3dstarr pairs with score"
     log: "00_log/{sample}_{genome}_500nt_3dstarrScore.bedtools"
     shell: """
-    if [ ! -d cool_3dstarr ]
-then
-     mkdir cool_3dstarr
-else
-     echo "Directory exists"
-fi
-awk '{{ if (($3-$2) >= 500) {{a=500/($3-$2)}} else if (($3-$2) < 500) {{a=1}}
-if (($12-$11) >= 500) {{b=(500/($12-$11))}} else if (($12-$11) < 500) {{b=1}}
-{{x=((($9/500)*a*$5) + (($18/500)*b*$14))}}
-{{print $6"\\t"$7"\\t"$8"\\t"$15"\\t"$16"\\t"$17"\\t"x}}' {input[0]} | \
+awk '{{ if (($3-$2) >= 500) {{a=500/($3-$2)}} else if (($3-$2) < 500) {{a=1}}; if (($12-$11) >= 500) {{b=(500/($12-$11))}} else if (($12-$11) < 500) {{b=1}}; {{ x=((($9/500)*a*$5) + (($18/500)*b*$14)) }}; {{ print $6"\\t"$7"\\t"$8"\\t"$15"\\t"$16"\\t"$17"\\t"x }}' {input[0]} | \
 sort -k1,1 -k2,2 -k3,3 -k4,4 -k5,5 -k6,6 | bedtools groupby -g 1,2,3,4,5,6 -c 7 -o sum > {output} 2> {log}
 """
 
