@@ -344,4 +344,3 @@ dependencies:
     - snakemake-executor-plugin-cluster-generic==1.0.9
     - snakemake-executor-plugin-slurm==0.8.0
     - snakemake-executor-plugin-slurm-jobstep==0.2.1
-prefix: /datacommons/ydiaolab/arinze/apps/miniconda_20220118/envs/snakemake_3dstarrseq

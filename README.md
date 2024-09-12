@@ -70,10 +70,12 @@ Recall that the FASTA and CHROMSIZES files needed to run the above code will be 
 ```
 4. Edit the `run_snake.sh` file by replacing lines 3 and 4 with the following 2 lines of code:
 ```
-source [path/to/your/miniconda/etc/profile.d/conda.sh]
+source [path_to_your_miniconda/etc/profile.d/conda.sh]
 conda activate [your_3dstarrseq_conda_environment]
 ```
 5. Now, start the pipeline by running `./run_snake.sh`.
+
+Note that on the node or local computer where the pipeline is run, the more available memory there is, the faster the pipeline will run. There is currently a step in the pipeline that makes use of postgesql database system and it is highly memory dependent.
 
 ### Output files: 
 This pipeline produces 3 main groups of outputs:
