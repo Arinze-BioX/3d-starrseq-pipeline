@@ -320,8 +320,10 @@ rule add_3dstarr_bin_scores_500nt:
     message: "Make final 3dstarr pairs with score"
     log: "00_log/{sample}_{genome}_500nt_3dstarrScore.bedtools"
     shell: """
-awk '{{ if (($3-$2) >= 500) {{a=500/($3-$2)}} else if (($3-$2) < 500) {{a=1}}; if (($12-$11) >= 500) {{b=(500/($12-$11))}} else if (($12-$11) < 500) {{b=1}}; {{ x=((($9/500)*a*$5) + (($18/500)*b*$14)) }}; {{ print $6"\\t"$7"\\t"$8"\\t"$15"\\t"$16"\\t"$17"\\t"x }}' {input[0]} | \
-sort -k1,1 -k2,2 -k3,3 -k4,4 -k5,5 -k6,6 | bedtools groupby -g 1,2,3,4,5,6 -c 7 -o sum > {output} 2> {log}
+awk '{{ if (($3-$2) >= 500) {{a=500/($3-$2)}} else if (($3-$2) < 500) {{a=1}}
+if (($12-$11) >= 500) {{b=(500/($12-$11))}} else if (($12-$11) < 500) {{b=1}}
+{{x=((($9/500)*a*$5) + (($18/500)*b*$14))}}
+{{print $6"\\t"$7"\\t"$8"\\t"$15"\\t"$16"\\t"$17"\\t"x}} }}' {input[0]} | sort -k1,1 -k2,2 -k3,3 -k4,4 -k5,5 -k6,6 | bedtools groupby -g 1,2,3,4,5,6 -c 7 -o sum > {output} 2> {log}
 """
 
 rule make_3dstarr_cool:
