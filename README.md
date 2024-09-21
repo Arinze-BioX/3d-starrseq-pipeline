@@ -73,9 +73,15 @@ Recall that the FASTA and CHROMSIZES files needed to run the above code will be 
 source [path_to_your_miniconda/etc/profile.d/conda.sh]
 conda activate [your_3dstarrseq_conda_environment]
 ```
-5. Now, start the pipeline by running `./run_snake.sh`.
+5. Ensure there are no running postgre server processes on the local machine or node by running:
+```
+ps -u [linux_user] | grep postgres #lists running processes owned by `linux_user` relating to postgres
+pkill -f postgres #cancels the running postgres processes. This is needed to run the pipeline.
+```
 
-Note that on the node or local computer where the pipeline is run, the more available memory there is, the faster the pipeline will run. There is currently a step in the pipeline that makes use of postgesql database system and it is highly memory dependent.
+6. Now, start the pipeline by running `./run_snake.sh`.
+
+*Note that on the node or local computer where the pipeline is run, the more available memory there is, the faster the pipeline will run. There is currently a step in the pipeline that makes use of postgesql database system and it is highly memory dependent.*
 
 ### Output files: 
 This pipeline produces 3 main groups of outputs:
