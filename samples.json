@@ -22,5 +22,9 @@
     "GM_RNA_R2R1_rep3": {
         "R1": ["/cwork/aeo21/3D-STARRseq/RNA_lib_demultiplex_July2024/combined/AO119_GM_3DSTARRseq_RNA_R2R1_rep3_R1_001.fastq.gz"],
         "R2": ["/cwork/aeo21/3D-STARRseq/RNA_lib_demultiplex_July2024/combined/AO119_GM_3DSTARRseq_RNA_R2R1_rep3_R2_001.fastq.gz"]
+    },
+    "GM_RNA_R2R1_rep2b": {
+        "R1": ["/cwork/aeo21/3D-STARRseq/GM_cDNA_demultiplex_Sept2024/GM_RNA_R2R1_combined_rep1245_R1_001.fastq.gz"],
+        "R2": ["/cwork/aeo21/3D-STARRseq/GM_cDNA_demultiplex_Sept2024/GM_RNA_R2R1_combined_rep1245_R2_001.fastq.gz"]
     }
 }
