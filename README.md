@@ -81,7 +81,7 @@ pkill -f postgres #cancels the running postgres processes. This is needed to run
 
 6. Now, start the pipeline by running `./run_snake.sh`.
 
-*Note that on the node or local computer where the pipeline is run, the more available memory there is, the faster the pipeline will run. There is currently a step in the pipeline that makes use of postgesql database system and it is highly memory dependent.*
+*Note that on the node or local computer where the pipeline is run, the more available memory there is, the faster the pipeline will run. There is currently a step in the pipeline that makes use of postgesql database system and it is highly memory dependent. If the `combine_3dstarr_bin_pairs` step fails with a missingOutputException, please try increasing available RAM to the maximum.*
 
 ### Output files: 
 This pipeline produces 3 main groups of outputs:
