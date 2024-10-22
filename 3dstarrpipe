@@ -28,11 +28,11 @@ inner_db    = config['inner_db']
 
 TARGETS = []
 peaks  = expand("macs2_peak/{sample}_{genome}_peaks.narrowPeak" , sample = SAMPLES, genome = genome)
-final_cool1 = expand("cool_3dstarr/final_{sample}_{genome}_weighted_500nt.cool", sample = SAMPLES, genome = genome)
-final_cool2 = expand("cool_3dstarr/final_{sample}_{genome}_unweighted_500nt.cool", sample = SAMPLES, genome = genome)
-nla3_pairs = expand("binned_frags-{genome}/{sample}_R1_nla3_bins.bed", sample = SAMPLES, genome = genome)
+final_cool1 = expand("cool_3dstarr/final_{sample}_{genome}_binpair_rawCounts_500nt.cool", sample = SAMPLES, genome = genome)
+final_cool2 = expand("cool_3dstarr/final_{sample}_{genome}_unweighted_500nt_DepthNorm.cool", sample = SAMPLES, genome = genome)
+nla3_pairs = expand("binned_frags-{genome}/{sample}_R1_nla3_LengthCut_DepthNorm_bins.bed", sample = SAMPLES, genome = genome)
 hic_loops = expand("coolers-{genome}/{sample}.{cool_bin}_loops.tsv", sample = SAMPLES, genome = genome, cool_bin = cool_bin)
-final_cool3 = expand("cool_3dstarr/final_{sample}_{genome}_weighted_500nt_LengthCut_DepthNorm.cool", sample = SAMPLES, genome = genome)
+final_cool3 = expand("cool_3dstarr/final_{sample}_{genome}_weighted_500nt_LengthDepthNorm.cool", sample = SAMPLES, genome = genome)
 TARGETS.extend(peaks)
 TARGETS.extend(final_cool1)
 TARGETS.extend(final_cool2)
@@ -258,7 +258,7 @@ rule depth_normalize_3dstarr_counts:
     shell: """
 total_counts_{wildcards.sample}=( $(awk '{{total_counts+=$8}}; END{{print total_counts}}' {input}) )
 awk -v total="$total_counts_{wildcards.sample}" 'BEGIN {{OFS="\\t"}}
-{{$8 = ($8/(total/1000000))}}
+{{$9 = ($8/(total/1000000))}}
 {{ if (! ((($3 - $2) < 5 || ($3 - $2) > 5000) && (($6 - $5) < 5 || ($6 - $5) > 5000))) print $0 }}' {input} > {output}
 """
 
@@ -272,9 +272,10 @@ rule map_3dstarr_frags_to_500nt_bin:
     params: BIN500 = {BIN500}
     log: "00_log/{sample}_{genome}_mapBins_500nt.bedtools"
     shell: """
-awk '{{print $1"\\t"$2"\\t"$3"\\t"$7"\\t"$8}}' {input} | bedtools intersect -a stdin -b {params.BIN500} -wo > {output[0]} 2> {log}
-awk '{{print $4"\\t"$5"\\t"$6"\\t"$7"\\t"$8}}' {input} | bedtools intersect -a stdin -b {params.BIN500} -wo > {output[1]} 2> {log}
+awk '{{print $1"\\t"$2"\\t"$3"\\t"$7"\\t"$8"\\t"$9}}' {input} | bedtools intersect -a stdin -b {params.BIN500} -wo > {output[0]} 2> {log}
+awk '{{print $4"\\t"$5"\\t"$6"\\t"$7"\\t"$8"\\t"$9}}' {input} | bedtools intersect -a stdin -b {params.BIN500} -wo > {output[1]} 2> {log}
 """
+
 
 rule map_3dstarr_frags_to_Nla3_frags:
     input: "final_bed-{genome}/{sample}_unique_pairs_with_LengthCut_DepthNorm_counts.bedpe"
@@ -284,9 +285,10 @@ rule map_3dstarr_frags_to_Nla3_frags:
     params: nla3_bed = {nla3_bed}
     log: "00_log/{sample}_{genome}_mapBins_nla3.bedtools"
     shell: """
-awk '{{print $1"\\t"$2"\\t"$3"\\t"$7"\\t"$8}}' {input} | bedtools intersect -a stdin -b {params.nla3_bed} -wo > {output[0]} 2> {log}
-awk '{{print $4"\\t"$5"\\t"$6"\\t"$7"\\t"$8}}' {input} | bedtools intersect -a stdin -b {params.nla3_bed} -wo > {output[1]} 2> {log}
+awk '{{print $1"\\t"$2"\\t"$3"\\t"$7"\\t"$8"\\t"$9}}' {input} | bedtools intersect -a stdin -b {params.nla3_bed} -wo > {output[0]} 2> {log}
+awk '{{print $4"\\t"$5"\\t"$6"\\t"$7"\\t"$8"\\t"$9}}' {input} | bedtools intersect -a stdin -b {params.nla3_bed} -wo > {output[1]} 2> {log}
 """
+
 
 rule combine_3dstarr_bin_pairs:
     input:  "binned_frags-{genome}/{sample}_R1_500nt_LengthCut_DepthNorm_bins.bed", 
@@ -331,55 +333,53 @@ sleep 5m
 pg_ctl -D {params.db} stop || echo "server already stopped"
 """
 
-rule add_weighted_3dstarr_bin_scores_500nt:
-    input: "binned_frags-{genome}/{sample}_500nt_bin_pairs.bedpe", "closed_server.txt"
-    output: "cool_3dstarr/final_{sample}_{genome}_weighted_500nt.bedpe"
-    message: "Make final 3dstarr pairs with score"
-    log: "00_log/{sample}_{genome}_weighted_500nt_3dstarrScore.bedtools"
+rule add_unweighted_3dstarr_raw_counts_500nt:
+    input: "binned_frags-{genome}/{sample}_500nt_LengthCut_DepthNorm_bin_pairs.bedpe", "closed_server.txt"
+    output: "cool_3dstarr/final_{sample}_{genome}_binpair_rawCounts_500nt.bedpe"
+    message: "Get raw fragment counts supporting each bin pair"
+    log: "00_log/{sample}_{genome}_binpair_rawCounts.bedtools"
     shell: """
-awk '{{ if (($3-$2) >= 500) {{a=500/($3-$2)}} else if (($3-$2) < 500) {{a=1}}
-if (($12-$11) >= 500) {{b=(500/($12-$11))}} else if (($12-$11) < 500) {{b=1}}
-{{x=((($9/500)*a*$5) + (($18/500)*b*$14))}}
-{{print $6"\\t"$7"\\t"$8"\\t"$15"\\t"$16"\\t"$17"\\t"x}} }}' {input[0]} | sort -k1,1 -k2,2 -k3,3 -k4,4 -k5,5 -k6,6 | bedtools groupby -g 1,2,3,4,5,6 -c 7 -o sum > {output} 2> {log}
+awk '{{ {{x=($5+$15)}}
+{{print $7"\\t"$8"\\t"$9"\\t"$17"\\t"$18"\\t"$19"\\t"x}} }}' {input[0]} | sort -k1,1 -k2,2 -k3,3 -k4,4 -k5,5 -k6,6 | bedtools groupby -g 1,2,3,4,5,6 -c 7 -o sum > {output} 2> {log}
+
 """
 
 
 rule add_weighted_lengthNorm_3dstarr_bin_scores_500nt:
     input: "binned_frags-{genome}/{sample}_500nt_LengthCut_DepthNorm_bin_pairs.bedpe", "closed_server.txt"
-    output: "cool_3dstarr/final_{sample}_{genome}_weighted_500nt_LengthCut_DepthNorm.bedpe"
+    output: "cool_3dstarr/final_{sample}_{genome}_weighted_500nt_LengthDepthNorm.bedpe"
     message: "Make final 3dstarr pairs with score"
     log: "00_log/{sample}_{genome}_weighted_500nt_3dstarrScore.bedtools"
     shell: """
-awk '{{ {{a=100/($3-$2)}}
-{{b=(100/($12-$11))}}
-{{x=((($9/500)*a*$5) + (($18/500)*b*$14))}}
-{{print $6"\\t"$7"\\t"$8"\\t"$15"\\t"$16"\\t"$17"\\t"x}} }}' {input[0]} | sort -k1,1 -k2,2 -k3,3 -k4,4 -k5,5 -k6,6 | bedtools groupby -g 1,2,3,4,5,6 -c 7 -o sum > {output} 2> {log}
+awk '{{ {{a=500/($3-$2)}}
+{{b=(500/($13-$12))}}
+{{x=((($10/500)*a*$6) + (($20/500)*b*$16))}}
+{{print $7"\\t"$8"\\t"$9"\\t""$17"\\t"$18"\\t"$19"\\t"x}} }}' {input[0]} | sort -k1,1 -k2,2 -k3,3 -k4,4 -k5,5 -k6,6 | bedtools groupby -g 1,2,3,4,5,6 -c 7 -o sum > {output} 2> {log}
 """
-
 
 rule add_unweighted_3dstarr_bin_scores_500nt:
     input: "binned_frags-{genome}/{sample}_500nt_LengthCut_DepthNorm_bin_pairs.bedpe", "closed_server.txt"
-    output: "cool_3dstarr/final_{sample}_{genome}_unweighted_500nt_LengthCut_DepthNorm.bedpe"
-    message: "Make final 3dstarr pairs with score"
+    output: "cool_3dstarr/final_{sample}_{genome}_unweighted_500nt_DepthNorm.bedpe"
+    message: "Make unweighted 3dstarr pairs with score"
     log: "00_log/{sample}_{genome}_unweighted_500nt_3dstarrScore.bedtools"
     shell: """
-awk '{{{{a=1}}; {{b=1}}; {{x=((($9/500)*a*$5) + (($18/500)*b*$14))}}
-{{print $6"\\t"$7"\\t"$8"\\t"$15"\\t"$16"\\t"$17"\\t"x}} }}' {input[0]} | sort -k1,1 -k2,2 -k3,3 -k4,4 -k5,5 -k6,6 | bedtools groupby -g 1,2,3,4,5,6 -c 7 -o sum > {output} 2> {log}
+awk '{{{{x= ($6 + $16) }}
+{{print $7"\\t"$8"\\t"$9"\\t""$17"\\t"$18"\\t"$19"\\t"x}} }}' {input[0]} | sort -k1,1 -k2,2 -k3,3 -k4,4 -k5,5 -k6,6 | bedtools groupby -g 1,2,3,4,5,6 -c 7 -o sum > {output} 2> {log}
 """
 
-rule make_weighted_3dstarr_cool:
-    input: "cool_3dstarr/final_{sample}_{genome}_weighted_500nt.bedpe"
-    output: "cool_3dstarr/final_{sample}_{genome}_weighted_500nt.cool"
-    message: "Make final 3dstarr cool file"
-    log: "00_log/{sample}_{genome}_500nt_3dstarrCool.cooler"
+rule make_raw_3dstarr_cool:
+    input: "cool_3dstarr/final_{sample}_{genome}_binpair_rawCounts_500nt.bedpe"
+    output: "cool_3dstarr/final_{sample}_{genome}_binpair_rawCounts_500nt.cool"
+    message: "Make final 3dstarr cool file for raw counts"
+    log: "00_log/{sample}_{genome}_rawCounts_3dstarrCool.cooler"
     params: BIN500={BIN500}
     shell: """
 cooler load -f bg2 --assembly hg38 --count-as-float --no-symmetric-upper {params.BIN500} {input} {output} 2> {log}
 """
 
 rule make_weighted_lengthNorm_3dstarr_cool:
-    input: "cool_3dstarr/final_{sample}_{genome}_weighted_500nt_LengthCut_DepthNorm.bedpe"
-    output: "cool_3dstarr/final_{sample}_{genome}_weighted_500nt_LengthCut_DepthNorm.cool"
+    input: "cool_3dstarr/final_{sample}_{genome}_weighted_500nt_LengthDepthNorm.bedpe"
+    output: "cool_3dstarr/final_{sample}_{genome}_weighted_500nt_LengthDepthNorm.cool"
     message: "Make final 3dstarr cool file"
     log: "00_log/{sample}_{genome}_500nt_3dstarrCool.cooler"
     params: BIN500={BIN500}
@@ -388,8 +388,8 @@ cooler load -f bg2 --assembly hg38 --count-as-float --no-symmetric-upper {params
 """
 
 rule make_unweighted_3dstarr_cool:
-    input: "cool_3dstarr/final_{sample}_{genome}_unweighted_500nt_LengthCut_DepthNorm.bedpe"
-    output: "cool_3dstarr/final_{sample}_{genome}_unweighted_500nt_LengthCut_DepthNorm.cool"
+    input: "cool_3dstarr/final_{sample}_{genome}_unweighted_500nt_DepthNorm.bedpe"
+    output: "cool_3dstarr/final_{sample}_{genome}_unweighted_500nt_DepthNorm.cool"
     message: "Make final 3dstarr cool file"
     log: "00_log/{sample}_{genome}_500nt_3dstarrCool.cooler"
     params: BIN500={BIN500}

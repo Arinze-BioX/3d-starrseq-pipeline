@@ -28,3 +28,4 @@ cool_3dstarr/*
 .snakemake/slurm_logs/*
 logfile
 *.txt
+cool_3dstarr_old
