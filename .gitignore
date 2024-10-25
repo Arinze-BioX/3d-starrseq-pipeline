@@ -4,15 +4,19 @@ filtered-hg38
 samples.json
 samples.tsv
 final_bed-hg38
+final_bed-hg38_old
 00_UMI_named_fq
 00_valid_fastq
 01_bam
 02_bam
 macs2_peak
+macs2_peak_old
 cluster.json
 pairs-hg38
+pairs-hg38_old
 peaks-hg38
 coolers-hg38
+coolers-hg38_old
 umicollapse_dedup
 binned_frags-hg38
 final_3dstarr
@@ -29,3 +33,4 @@ cool_3dstarr/*
 logfile
 *.txt
 cool_3dstarr_old
+.snakemake/*

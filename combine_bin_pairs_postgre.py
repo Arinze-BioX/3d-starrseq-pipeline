@@ -84,7 +84,7 @@ def load_data_to_postgres(tsv_file, table_name, db_name, user, password, host, p
         conn.commit()
 
 #set names of columns for tables
-table_names = ["Frag_chrom", "frag_start", "frag_end", "name",
+table_names = ["Frag_chrom", "frag_start", "frag_end", "name", "count",
                 "score","bin_chrom","bin_start","bin_end","overlap"]
 
 #load tables to database
