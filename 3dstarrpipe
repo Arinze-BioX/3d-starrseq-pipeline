@@ -259,7 +259,7 @@ rule depth_normalize_3dstarr_counts:
 total_counts_{wildcards.sample}=( $(awk '{{total_counts+=$8}}; END{{print total_counts}}' {input}) )
 awk -v total="$total_counts_{wildcards.sample}" 'BEGIN {{OFS="\\t"}}
 {{$9 = ($8/(total/1000000))}}
-{{ if (! ((($3 - $2) < 5 || ($3 - $2) > 5000) && (($6 - $5) < 5 || ($6 - $5) > 5000))) print $0 }}' {input} > {output}
+{{ if (! ((($3 - $2) < 20 || ($3 - $2) > 1000) && (($6 - $5) < 20 || ($6 - $5) > 1000))) print $0 }}' {input} > {output}
 """
 
 
